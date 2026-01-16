@@ -10,23 +10,23 @@ interface PreLoaderProps {
   onComplete: () => void;
 }
 
-// Generate particle positions once at module level
-const generateParticlePositions = () => {
-  return Array.from({ length: 60 }, () => ({
-    initialX: (Math.random() - 0.5) * 1400,
-    initialY: (Math.random() - 0.5) * 1400,
-  }));
-};
-
-const PARTICLE_POSITIONS = generateParticlePositions();
-
 export default function PreLoader({ onComplete }: PreLoaderProps) {
   const container = useRef<HTMLElement>(null);
 
-  // Particle target positions (circle around logo)
-  const particleTargets = useMemo(() => {
-    const radius = 80;
-    return [
+  // Generate particles on component mount for responsive sizing
+  const particles = useMemo(() => {
+    // Use smaller spread for mobile devices
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const spread = isMobile ? 600 : 1400;
+    
+    const particlePositions = Array.from({ length: 60 }, () => ({
+      initialX: (Math.random() - 0.5) * spread,
+      initialY: (Math.random() - 0.5) * spread,
+    }));
+
+    // Particle target positions (circle around logo)
+    const radius = isMobile ? 60 : 80;
+    const particleTargets = [
       { x: 0, y: -radius, color: "#FF8A00" },
       { x: -radius * 0.7, y: -radius * 0.4, color: "#FF8A00" },
       { x: radius * 0.7, y: -radius * 0.4, color: "#FF4D4D" },
@@ -36,10 +36,8 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
       { x: -radius * 0.7, y: radius * 0.4, color: "#00E0FF" },
       { x: -radius, y: 0, color: "#70FF00" },
     ];
-  }, []);
 
-  const particles = useMemo(() => {
-    return PARTICLE_POSITIONS.map((pos, i) => {
+    return particlePositions.map((pos, i) => {
       const target = particleTargets[i % particleTargets.length];
       return {
         id: i,
@@ -50,7 +48,7 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
         color: target.color,
       };
     });
-  }, [particleTargets]);
+  }, []);
 
   useGSAP(
     () => {
@@ -174,4 +172,4 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
       <div className={styles.bgGlow}></div>
     </section>
   );
-} 
+}
