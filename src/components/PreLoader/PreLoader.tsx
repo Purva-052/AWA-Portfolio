@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./PreLoader.module.scss";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -10,94 +10,112 @@ interface PreLoaderProps {
   onComplete: () => void;
 }
 
-export default function PreLoader({ onComplete }: PreLoaderProps) {
-  const container = useRef<HTMLElement>(null);
+interface Particle {
+  id: number;
+  initialX: number;
+  initialY: number;
+  targetX: number;
+  targetY: number;
+  color: string;
+}
 
-  // Generate particles on component mount for responsive sizing
-  const particles = useMemo(() => {
-    // Use smaller spread for mobile devices
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    const spread = isMobile ? 600 : 1400;
-    
-    const particlePositions = Array.from({ length: 60 }, () => ({
+// Generate particles function
+function generateParticles(): Particle[] {
+  if (typeof window === 'undefined') return [];
+  
+  const isMobile = window.innerWidth < 768;
+  const spread = isMobile ? 800 : 1400;
+  const radius = isMobile ? 60 : 80;
+
+  const particleTargets = [
+    { x: 0, y: -radius, color: "#FF8A00" },
+    { x: -radius * 0.7, y: -radius * 0.4, color: "#FF8A00" },
+    { x: radius * 0.7, y: -radius * 0.4, color: "#FF4D4D" },
+    { x: radius, y: 0, color: "#FF00E5" },
+    { x: radius * 0.7, y: radius * 0.4, color: "#9D00FF" },
+    { x: 0, y: radius, color: "#0094FF" },
+    { x: -radius * 0.7, y: radius * 0.4, color: "#00E0FF" },
+    { x: -radius, y: 0, color: "#70FF00" },
+  ];
+
+  return Array.from({ length: 60 }, (_, i) => {
+    const target = particleTargets[i % particleTargets.length];
+    return {
+      id: i,
       initialX: (Math.random() - 0.5) * spread,
       initialY: (Math.random() - 0.5) * spread,
-    }));
+      targetX: target.x,
+      targetY: target.y,
+      color: target.color,
+    };
+  });
+}
 
-    // Particle target positions (circle around logo)
-    const radius = isMobile ? 60 : 80;
-    const particleTargets = [
-      { x: 0, y: -radius, color: "#FF8A00" },
-      { x: -radius * 0.7, y: -radius * 0.4, color: "#FF8A00" },
-      { x: radius * 0.7, y: -radius * 0.4, color: "#FF4D4D" },
-      { x: radius, y: 0, color: "#FF00E5" },
-      { x: radius * 0.7, y: radius * 0.4, color: "#9D00FF" },
-      { x: 0, y: radius, color: "#0094FF" },
-      { x: -radius * 0.7, y: radius * 0.4, color: "#00E0FF" },
-      { x: -radius, y: 0, color: "#70FF00" },
-    ];
-
-    return particlePositions.map((pos, i) => {
-      const target = particleTargets[i % particleTargets.length];
-      return {
-        id: i,
-        initialX: pos.initialX,
-        initialY: pos.initialY,
-        targetX: target.x,
-        targetY: target.y,
-        color: target.color,
-      };
-    });
-  }, []);
+export default function PreLoader({ onComplete }: PreLoaderProps) {
+  const container = useRef<HTMLElement>(null);
+  const particleRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const logoRef = useRef<HTMLDivElement>(null);
+  
+  // Lazy initialization - function only runs ONCE on mount
+  const [particles] = useState<Particle[]>(() => generateParticles());
 
   useGSAP(
     () => {
-      if (container.current) {
-        const tl = gsap.timeline();
+      if (!container.current || particles.length === 0) return;
 
-        // Set initial states IMMEDIATELY for all particles
-        particles.forEach((particle, i) => {
-          gsap.set(`[data-particle="${i}"]`, {
-            x: particle.initialX,
-            y: particle.initialY,
+      const tl = gsap.timeline();
+
+      // Set initial states using refs
+      particleRefs.current.forEach((particle, i) => {
+        if (particle && particles[i]) {
+          gsap.set(particle, {
+            x: particles[i].initialX,
+            y: particles[i].initialY,
             opacity: 1,
           });
-        });
+        }
+      });
 
-        // Set logo to hidden IMMEDIATELY
-        gsap.set(`.${styles.logoSymbol}`, { 
+      // Set logo to hidden
+      if (logoRef.current) {
+        gsap.set(logoRef.current, { 
           scale: 0, 
           opacity: 0,
           visibility: "hidden"
         });
+      }
 
-        // STAGE 1: Particles gather to center (0-2s)
-        particles.forEach((particle, i) => {
+      // STAGE 1: Particles gather to center (0-2s)
+      particleRefs.current.forEach((particle, i) => {
+        if (particle && particles[i]) {
           tl.to(
-            `[data-particle="${i}"]`,
+            particle,
             {
-              x: particle.targetX,
-              y: particle.targetY,
+              x: particles[i].targetX,
+              y: particles[i].targetY,
               duration: 2,
               ease: "power2.inOut",
             },
             0
           );
-        });
+        }
+      });
 
-        // STAGE 2: Particles fade out, First logo (symbol) appears (2-2.5s)
-        tl.to(
-          `.${styles.particle}`,
-          {
-            opacity: 0,
-            scale: 0.5,
-            duration: 0.3,
-          },
-          2
-        );
+      // STAGE 2: Particles fade out (2-2.3s)
+      tl.to(
+        particleRefs.current.filter(Boolean),
+        {
+          opacity: 0,
+          scale: 0.5,
+          duration: 0.3,
+        },
+        2
+      );
 
+      // STAGE 3: Logo appears (2.1-2.7s)
+      if (logoRef.current) {
         tl.to(
-          `.${styles.logoSymbol}`,
+          logoRef.current,
           {
             scale: 1,
             opacity: 1,
@@ -107,27 +125,26 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
           },
           2.1
         );
-
-        // STAGE 3: Hold first logo (2.7-3.5s)
-        tl.to({}, { duration: 0.8 }, 2.7);
-
-        // STAGE 4: Slide UP transition - reveals homepage underneath (3.5-4.5s)
-        tl.to(
-          container.current,
-          {
-            y: "-100%",
-            duration: 1,
-            ease: "power3.inOut",
-            onComplete: () => {
-              // Small delay before calling onComplete to ensure smooth transition
-              setTimeout(() => {
-                onComplete();
-              }, 100);
-            },
-          },
-          3.5
-        );
       }
+
+      // STAGE 4: Hold logo (2.7-3.5s)
+      tl.to({}, { duration: 0.8 }, 2.7);
+
+      // STAGE 5: Slide UP transition (3.5-4.5s)
+      tl.to(
+        container.current,
+        {
+          y: "-100%",
+          duration: 1,
+          ease: "power3.inOut",
+          onComplete: () => {
+            setTimeout(() => {
+              onComplete();
+            }, 100);
+          },
+        },
+        3.5
+      );
     },
     { scope: container, dependencies: [particles] }
   );
@@ -139,12 +156,13 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
         {particles.map((particle, i) => (
           <div
             key={particle.id}
-            data-particle={i}
+            ref={(el) => {
+              particleRefs.current[i] = el;
+            }}
             className={styles.particle}
             style={{
               backgroundColor: particle.color,
               opacity: 0,
-              transform: `translate(${particle.initialX}px, ${particle.initialY}px)`,
             }}
           />
         ))}
@@ -152,8 +170,8 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
 
       {/* Logo Container */}
       <div className={styles.logoContainer}>
-        {/* First Logo - Symbol - Hidden by default via inline style */}
         <div 
+          ref={logoRef}
           className={styles.logoSymbol}
           style={{ opacity: 0, transform: "scale(0)", visibility: "hidden" }}
         >

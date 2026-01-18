@@ -17,23 +17,28 @@ import HeaderItems from "./HeaderItems";
 
 export default function HeaderMenu() {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY < 100) setIsVisible(true);
-      else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+
+      if (currentScrollY <= 80) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollYRef.current) {
         setIsVisible(false);
         setIsMobileMenuOpen(false);
-      } else if (currentScrollY < lastScrollY) setIsVisible(true);
-      setLastScrollY(currentScrollY);
+      } else {
+        setIsVisible(true);
+      }
+
+      lastScrollYRef.current = currentScrollY;
     };
-    window.addEventListener("scroll", controlNavbar);
+
+    window.addEventListener("scroll", controlNavbar, { passive: true });
     return () => window.removeEventListener("scroll", controlNavbar);
-  }, [lastScrollY]);
+  }, []);
 
   const handleNavigation = async (
     path: string,
@@ -52,13 +57,12 @@ export default function HeaderMenu() {
 
   return (
     <header
-      ref={headerRef}
-      className={`fixed top-0 z-50 w-full transition-transform duration-300 ease-in-out ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
+      className={`fixed top-0 z-50 w-full px-4 sm:px-6 lg:px-12 transition-transform duration-300 ease-in-out ${
+        isVisible ? "translate-y-0" : "-translate-y-[150%]"
       }`}
     >
       <div
-        className="container mx-auto px-4 py-2 flex justify-between rounded-full transition-all duration-300 mt-6 backdrop-blur-[57.85px]"
+        className="mx-auto mt-6 flex w-full max-w-7xl items-center justify-between rounded-full px-6 py-1 backdrop-blur-[57.85px] transition-all duration-300"
         style={{
           background:
             "linear-gradient(90deg, rgba(95, 95, 95, 0.5) 10.28%, rgba(150, 150, 150, 0.5) 100%)",
@@ -69,8 +73,8 @@ export default function HeaderMenu() {
             src="/logo.png"
             alt="Logo"
             title="Logo"
-            width={130}
-            height={135}
+            width={124}
+            height={129}
             className="h-12 w-auto transition-all duration-300"
           />
         </Link>
@@ -86,27 +90,30 @@ export default function HeaderMenu() {
         >
           <DrawerTrigger asChild>
             <button className="md:hidden focus:outline-none">
-              <Menu className="w-6 h-6 transition-colors duration-300 text-white cursor-pointer" />
+              <Menu className="h-6 w-6 cursor-pointer text-white transition-colors duration-300" />
             </button>
           </DrawerTrigger>
-          <DrawerContent className="bg-gradient-to-r from-white/7 to-white/8 backdrop-blur-[57.85px] border-none">
+
+          <DrawerContent className="border-none bg-gradient-to-r from-white/7 to-white/8 backdrop-blur-[57.85px]">
             <DrawerHeader className="flex flex-row items-center justify-between p-6">
-              <DrawerTitle className="text-white text-lg font-semibold">
+              <DrawerTitle className="text-lg font-semibold text-white">
                 Menu
               </DrawerTitle>
+
               <DrawerClose asChild>
                 <button className="focus:outline-none">
-                  <X className="w-6 h-6 text-white" />
+                  <X className="h-6 w-6 text-white" />
                 </button>
               </DrawerClose>
             </DrawerHeader>
-            <div className="px-6 pb-6 space-y-4">
+
+            <div className="space-y-4 px-6 pb-6">
               {menuItems.map((item) => (
                 <DrawerClose key={item.href} asChild>
                   <Link
                     href={item.href}
                     onClick={(e) => handleNavigation(item.href, e)}
-                    className="block text-[16px] hover:text-yellow-400 transition-colors text-white"
+                    className="block text-[16px] text-white transition-colors hover:text-yellow-400"
                   >
                     {item.text}
                   </Link>

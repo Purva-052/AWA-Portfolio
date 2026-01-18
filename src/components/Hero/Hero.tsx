@@ -13,6 +13,15 @@ export function Hero() {
   const textRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
 
+  const stripTexts = [
+    "Digital Marketing",
+    "Brand Strategy",
+    "Creative Design",
+    "Social Media",
+    "Content Creation",
+    "SEO Services",
+  ];
+
   useGSAP(
     () => {
       if (!containerRef.current) return;
@@ -25,9 +34,9 @@ export function Hero() {
         y: 30,
       });
 
-      // Set strip initial state - hidden below
+      // Set strip initial state - start from bottom
       gsap.set(stripRef.current, {
-        y: 100,
+        y: 200,
         opacity: 0,
       });
 
@@ -47,35 +56,30 @@ export function Hero() {
             ease: "power2.out",
           },
           "-=0.4"
+        )
+        .to(
+          stripRef.current,
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+          },
+          "-=0.3"
         );
 
-      // ScrollTrigger animation for the strip
-      gsap.to(stripRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          toggleActions: "play none none reverse",
-        },
-      });
-
-      // Continuous marquee animation for the strip
-      const marqueeElements = containerRef.current?.querySelectorAll('.marquee-content');
-      if (marqueeElements && marqueeElements.length > 0) {
-        marqueeElements.forEach((element) => {
+      // Continuous horizontal marquee animation for the strip
+      const marqueeContents = stripRef.current?.querySelectorAll('.marquee-content');
+      if (marqueeContents) {
+        marqueeContents.forEach((content) => {
           gsap.fromTo(
-            element,
-            { x: 0 },
+            content,
+            { x: '0%' },
             {
               x: '-100%',
               duration: 30,
               repeat: -1,
-              ease: 'linear',
+              ease: 'none',
             }
           );
         });
@@ -87,7 +91,7 @@ export function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen"
+      className="relative h-screen overflow-hidden"
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
@@ -104,12 +108,12 @@ export function Hero() {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center gap-8 md:gap-12 lg:gap-16 px-6 md:px-12 lg:px-20 py-16 md:py-50 pb-24 md:pb-28">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 xl:gap-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20 py-12 sm:py-16 md:py-20 pb-30 sm:pb-28 md:pb-32 lg:pb-10">
         
         {/* Logo - with better proportions */}
         <div 
           ref={logoRef}
-          className="relative w-[200px] h-[80px] sm:w-[280px] sm:h-[110px] md:w-[360px] md:h-[140px] lg:w-[440px] lg:h-[170px] flex-shrink-0 overflow-hidden"
+          className="relative w-[280px] h-[200px] xs:w-[180px] xs:h-[72px] sm:w-[220px] sm:h-[88px] md:w-[280px] md:h-[110px] lg:w-[360px] lg:h-[140px] xl:w-[300px] xl:h-[150px] flex-shrink-0 overflow-hidden"
         >
           <Image
             src="/fullLogo.png"
@@ -121,72 +125,47 @@ export function Hero() {
         </div>
 
         {/* Text Content */}
-        <div ref={textRef} className="max-w-5xl text-center space-y-4 md:space-y-6 lg:space-y-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight px-4">
+        <div ref={textRef} className="max-w-5xl text-center space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6 xl:-space-y-0.5">
+          <h1 className="text-3xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-bold text-gray-900 leading-tight px-3 sm:px-1">
             Welcome to the world of AWA
           </h1>
           
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-gray-700 leading-relaxed max-w-3xl mx-auto px-4">
-            Are you an Amdawadi? Then youre at the right place. Discover the vibrant culture, heritage, and innovation of Ahmedabad.
+          <p className="text-xl xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-xl text-gray-900 leading-relaxed max-w-3xl mx-auto px-3 sm:px-4">
+            Are you an Amdawadi? Then you&apos;re at the right place. Discover the vibrant culture, heritage, and innovation of Ahmedabad.
           </p>
         </div>
       </div>
 
-      {/* Animated Strip Design - Single Continuous Strip with Stats */}
+      {/* Animated Strip - positioned at bottom */}
       <div 
         ref={stripRef}
-        className="absolute bottom-0 left-0 right-0 z-20 overflow-hidden"
+        className="absolute bottom-0 sm:bottom-16 md:bottom-10 lg:bottom-0 left-0 right-0 z-20 overflow-hidden bg-black py-2 sm:py-3 md:py-2 lg:py-2 xl:py-2"
       >
-        <div className="bg-black/90 backdrop-blur-sm py-4 md:py-4 shadow-2xl border-y border-white/10">
-          <div className="flex whitespace-nowrap">
-            <div className="marquee-content flex gap-8 md:gap-12 items-center px-4 md:px-6">
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">500+</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Influencer Marketing</span>
+        <div className="relative flex whitespace-nowrap">
+          {/* First marquee content */}
+          <div className="marquee-content flex gap-4 sm:gap-6 md:gap-8 lg:gap-12 xl:gap-16 items-center">
+            {stripTexts.map((text, index) => (
+              <div key={index} className="flex items-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 xl:gap-16">
+                <span className="text-white text-sm xs:text-base sm:text-sm md:text-sm lg:text-sm xl:text-sm font-bold uppercase tracking-wider">
+                  {text}
+                </span>
+                <span className="text-white text-sm sm:text-sm md:text-sm lg:text-sm xl:text-sm">★</span>
               </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-pink-400 to-orange-600 bg-clip-text text-transparent">150+</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Content Creation</span>
+            ))}
+          </div>
+          {/* Second marquee content (duplicate for seamless loop) */}
+          <div className="marquee-content flex gap-4 sm:gap-6 md:gap-8 lg:gap-12 xl:gap-16 items-center ml-4 sm:ml-6 md:ml-8 lg:ml-12 xl:ml-16">
+            {stripTexts.map((text, index) => (
+              <div key={`duplicate-${index}`} className="flex items-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 xl:gap-16">
+                <span className="text-white text-sm xs:text-base sm:text-sm md:text-sm lg:text-sm xl:text-sm font-bold uppercase tracking-wider">
+                  {text}
+                </span>
+                <span className="text-white text-sm sm:text-sm md:text-sm lg:text-sm xl:text-sm">★</span>
               </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">50M+</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Digital Marketing</span>
-              </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">95%</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Indoor & Outdoor Marketing</span>
-              </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-            </div>
-            <div className="marquee-content flex gap-8 md:gap-12 items-center px-4 md:px-6">
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">500+</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Social Media Management</span>
-              </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-pink-400 to-orange-600 bg-clip-text text-transparent">150+</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Branding & Design</span>
-              </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">50M+</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Event Marketing & PR</span>
-              </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-              <div className="flex items-center gap-2 md:gap-3">
-                {/* <span className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">95%</span> */}
-                <span className="text-xs md:text-sm lg:text-base text-white uppercase tracking-wider font-semibold">Client Retention</span>
-              </div>
-              <span className="text-white/30 text-xl md:text-2xl">|</span>
-            </div>
+            ))}
           </div>
         </div>
       </div>
-
     </section>
   );
 }
