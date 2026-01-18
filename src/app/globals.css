@@ -149,6 +149,27 @@ main {
 * {
   -webkit-overflow-scrolling: touch;
 }
+
+/* Add to your globals.css or a new mobile-fixes.css */
+@media (max-width: 640px) {
+  /* Reduce WhyChooseAWA padding on mobile */
+  section.why-choose-section {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  /* Reduce ServicesOverview padding on mobile */
+  section.services-overview-section {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  /* Or target all sections on mobile */
+  section {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;

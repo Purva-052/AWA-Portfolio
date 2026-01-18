@@ -6,14 +6,13 @@ import { Hero } from "@/components/Hero/Hero";
 // import MainLayout from "@/components/layout/MainLayout";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import WhyChooseAWA from "@/components/WhyChooseUs/whyChooseUs";
+import ServicesOverview from "@/components/services/overView";
 
 export default function HomePage() {
   useEffect(() => {
-    // ✅ Fix: allow arrow keys to scroll without clicking
     document.body.tabIndex = -1;
     document.body.focus();
 
-    // ✅ Fix: force GSAP ScrollTrigger to update on keyboard scroll
     const onKeyDown = (e: KeyboardEvent) => {
       if (
         e.key === "ArrowDown" ||
@@ -42,6 +41,7 @@ export default function HomePage() {
       <Hero />
       <AboutUs />
       <WhyChooseAWA/>
+      <ServicesOverview/>
     </>
   );
 }
