@@ -7,6 +7,8 @@ import { Hero } from "@/components/Hero/Hero";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import WhyChooseAWA from "@/components/WhyChooseUs/whyChooseUs";
 import ServicesOverview from "@/components/services/overView";
+import Portfolio from "@/components/Portfolio/portfolio";
+import ContactFooter from "@/components/Contact/contact";
 
 export default function HomePage() {
   useEffect(() => {
@@ -42,6 +44,8 @@ export default function HomePage() {
       <AboutUs />
       <WhyChooseAWA/>
       <ServicesOverview/>
+      <Portfolio/>
+      <ContactFooter/>
     </>
   );
 }
