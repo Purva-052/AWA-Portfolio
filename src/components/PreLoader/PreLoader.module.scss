@@ -5,11 +5,22 @@
   align-items: center;
   justify-content: center;
   width: 100vw;
+  width: 100dvw;
+  
+  // Consistent height system
   height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  
   overflow: hidden;
   z-index: 99999998;
   background: #ffffff;
   will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .particleContainer {
@@ -21,20 +32,46 @@
 
 .particle {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  // Mobile-first approach
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   left: 50%;
   top: 50%;
-  margin-left: -6px;
-  margin-top: -6px;
+  margin-left: -4px;
+  margin-top: -4px;
   will-change: transform, opacity;
   
-  @media (max-width: 768px) {
+  // Small phones (360px+)
+  @media (min-width: 360px) {
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    margin-top: -4.5px;
+  }
+  
+  // Standard mobile (480px+)
+  @media (min-width: 480px) {
     width: 10px;
     height: 10px;
     margin-left: -5px;
     margin-top: -5px;
+  }
+  
+  // Tablets (768px+)
+  @media (min-width: 768px) {
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    margin-top: -6px;
+  }
+  
+  // Desktop (1024px+)
+  @media (min-width: 1024px) {
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    margin-top: -7px;
   }
 }
 
@@ -46,27 +83,76 @@
   justify-content: center;
   pointer-events: none;
   z-index: 2;
+  // Add padding for very small screens
+  padding: 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
 }
 
 .logoSymbol {
-  position: absolute;
-  width: 400px;
-  height: 350px;
+  position: relative; // Changed from absolute for better centering
+  // Mobile-first: Small phones (320px-375px)
+  width: 100px;
+  height: 100px;
+  max-width: 90vw; // Prevent overflow on tiny screens
+  max-height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
   will-change: transform, opacity;
   
-  @media (max-width: 768px) {
+  // iPhone SE and similar (375px+)
+  @media (min-width: 375px) {
     width: 120px;
     height: 120px;
+  }
+  
+  // Standard mobile (480px+)
+  @media (min-width: 480px) {
+    width: 150px;
+    height: 150px;
+  }
+  
+  // Large mobile / Small tablets (640px+)
+  @media (min-width: 640px) {
+    width: 200px;
+    height: 200px;
+  }
+  
+  // Tablets (768px+)
+  @media (min-width: 768px) {
+    width: 280px;
+    height: 280px;
+  }
+  
+  // Desktop (1024px+)
+  @media (min-width: 1024px) {
+    width: 350px;
+    height: 350px;
+  }
+  
+  // Large desktop (1280px+)
+  @media (min-width: 1280px) {
+    width: 400px;
+    height: 350px;
+  }
+  
+  // Extra large screens (1536px+)
+  @media (min-width: 1536px) {
+    width: 450px;
+    height: 400px;
   }
 }
 
 .logoImage {
-  // width: 100%;
-  // height: 89%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  // Prevent image distortion
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
 .bgGlow {
@@ -74,4 +160,5 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  background: #ffffff; // Ensure background fills completely
 }
