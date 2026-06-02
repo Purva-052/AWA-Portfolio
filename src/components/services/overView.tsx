@@ -4,16 +4,15 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import {
-  Users,
-  FileText,
-  TrendingUp,
-  Building2,
+  Video,
+  Youtube,
   Share2,
   Palette,
-  Calendar,
+  TrendingUp,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,18 +20,17 @@ interface Service {
   icon: React.ElementType;
   title: string;
   description: string;
+  slug: string;
 }
 
 interface ServicesOverviewProps {
   image?: string;
   services?: Service[];
-  backgroundColor?: string;
 }
 
 const ServicesOverview = ({
-  image = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop",
+  image = "/services_creative.png",
   services: customServices,
-  backgroundColor = "#f5f5f5",
 }: ServicesOverviewProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -47,48 +45,41 @@ const ServicesOverview = ({
 
   const [isMobile, setIsMobile] = useState(false);
 
-  const defaultServices = [
+  const defaultServices: Service[] = [
     {
-      icon: Users,
-      title: "Influencer Marketing",
+      slug: "short-form-production",
+      icon: Video,
+      title: "Short-Form Production",
       description:
-        "Connect with influential voices to expand your brand's reach and build authentic connections with your target audience",
+        "High-impact 9:16 videos for TikTok, Instagram Reels, and YouTube Shorts. Engineered with scroll-stopping hooks, fast retention-focused editing cuts, and professional sound design.",
     },
     {
-      icon: FileText,
-      title: "Content Creation",
+      slug: "long-form-growth",
+      icon: Youtube,
+      title: "Long-Form Growth",
       description:
-        "Craft compelling narratives and visual stories that engage, inspire, and convert your audience across all platforms",
+        "Complete editing, content structuring, high-CTR thumbnail styling, and metadata optimization for YouTube channels and podcasts to build long-term subscriber loyalty.",
     },
     {
-      icon: TrendingUp,
-      title: "Digital Marketing",
-      description:
-        "Drive measurable growth through data-driven strategies, performance optimization, and innovative digital campaigns",
-    },
-    {
-      icon: Building2,
-      title: "Indoor & Outdoor Marketing",
-      description:
-        "Capture attention with impactful traditional advertising solutions that complement your digital presence",
-    },
-    {
+      slug: "social-media-management",
       icon: Share2,
-      title: "Social Media Management",
+      title: "Platform Management",
       description:
-        "Build and nurture thriving communities across social platforms with strategic content and engagement",
+        "Hands-on scheduling, native caption writing, comment moderation, trend newsjacking, and weekly community scaling blueprints across all platforms.",
     },
     {
+      slug: "branding-design",
       icon: Palette,
-      title: "Branding & Design",
+      title: "Creator Brand & Identity",
       description:
-        "Create distinctive visual identities that resonate with your audience and set your brand apart from competitors",
+        "Visual layouts, custom color grading presets, custom thumbnail styles, brand deck configurations, and uniform media skins tailored to your personal creator brand.",
     },
     {
-      icon: Calendar,
-      title: "Event Marketing & PR",
+      slug: "strategy-auditing",
+      icon: TrendingUp,
+      title: "Growth Auditing & Consulting",
       description:
-        "Design memorable experiences and generate meaningful media coverage that amplifies your brand message",
+        "Granular review of viewer drop-off analytics, demographic analytics, retention curve fixes, CTR audits, and platform-specific audio/keyword recommendations.",
     },
   ];
 
@@ -102,7 +93,6 @@ const ServicesOverview = ({
     setCurrentIndex((prev) => (prev <= 0 ? services.length - 1 : prev - 1));
   };
 
-  // Helper function for manual navigation
   const handleManualNavigation = (direction: 'next' | 'prev') => {
     if (direction === 'next') {
       nextSlide();
@@ -110,8 +100,7 @@ const ServicesOverview = ({
       prevSlide();
     }
     setIsAutoPlaying(false);
-    // Resume auto-play after 3 seconds
-    setTimeout(() => setIsAutoPlaying(true), 500);
+    setTimeout(() => setIsAutoPlaying(true), 4000);
   };
 
   // Auto play
@@ -120,7 +109,7 @@ const ServicesOverview = ({
 
     const interval = setInterval(() => {
       nextSlide();
-    }, 2000);
+    }, 4500);
 
     return () => clearInterval(interval);
   }, [currentIndex, isAutoPlaying]);
@@ -133,7 +122,7 @@ const ServicesOverview = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // MOBILE (Repeatable IntersectionObserver like AboutUs)
+  // MOBILE (Repeatable IntersectionObserver)
   useEffect(() => {
     if (!isMobile) return;
 
@@ -145,7 +134,6 @@ const ServicesOverview = ({
 
     if (!titleEl || !descEl || !imgEl || !carouselEl || !navEl) return;
 
-    // Initial hidden state
     gsap.set([titleEl, descEl], { opacity: 0, y: 25 });
     gsap.set(imgEl, { opacity: 0, y: 35, scale: 0.95 });
     gsap.set(carouselEl, { opacity: 0, y: 28 });
@@ -187,7 +175,6 @@ const ServicesOverview = ({
       }
     };
 
-    // Observer: Image at 15% like your AboutUs
     const imageObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -208,7 +195,6 @@ const ServicesOverview = ({
       { threshold: 0.25 }
     );
 
-    // observe
     blockObserver.observe(titleEl);
     blockObserver.observe(descEl);
     blockObserver.observe(carouselEl);
@@ -268,21 +254,21 @@ const ServicesOverview = ({
 
   return (
     <div
+      id="services"
       ref={containerRef}
-      className="w-full py-8 sm:py-10 md:py-12 lg:py-16 xl:py-12 2xl:py-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-24"
-      style={{ backgroundColor }}
+      className="w-full py-16 sm:py-20 lg:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-background transition-colors duration-500 border-t border-black/5 dark:border-white/5"
     >
       {/* Section Header */}
-      <div className="max-w-[1400px] 2xl:max-w-[1800px] mx-auto mb-8 sm:mb-10 md:mb-12 lg:mb-14 xl:mb-10 2xl:mb-24">
+      <div className="max-w-6xl mx-auto mb-12">
         <h2
           ref={headerTitleRef}
-          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl 2xl:text-8xl font-bold text-[#2C2C2C] mb-2 sm:mb-3 md:mb-4 lg:mb-4 xl:mb-2 2xl:mb-8"
+          className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground mb-3 uppercase tracking-tight"
         >
           What We{" "}
           <span
             style={{
               background:
-                "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
+                "linear-gradient(135deg, #FF6B35 0%, #FF1493 50%, #9D00FF 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -293,83 +279,85 @@ const ServicesOverview = ({
         </h2>
         <p
           ref={headerDescRef}
-          className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-xl 2xl:text-4xl text-gray-600 max-w-2xl 2xl:max-w-5xl"
+          className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl font-medium"
         >
-          Comprehensive marketing solutions designed for your success
+          Complete visual production and optimization packages designed for creator growth.
         </p>
       </div>
 
       {/* Main Content Grid */}
-      <div className="max-w-[1400px] 2xl:max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12 xl:gap-16 2xl:gap-24">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+        
         {/* Right Side - Image */}
         <div
           ref={imageWrapRef}
-          className="order-1 lg:order-2 w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px] xl:h-[450px] 2xl:h-[700px] rounded-2xl sm:rounded-3xl md:rounded-3xl lg:rounded-3xl xl:rounded-3xl 2xl:rounded-[2.5rem] overflow-hidden shadow-xl"
+          className="order-1 lg:order-2 w-full h-[300px] sm:h-[350px] lg:h-auto rounded-3xl overflow-hidden shadow-xl border border-black/5 dark:border-white/10"
         >
           <img
             src={image}
-            alt="Our Services"
-            className="w-full h-full object-cover"
+            alt="AWA Social Services"
+            className="w-full h-full object-cover select-none"
           />
         </div>
 
         {/* Left Side - Carousel */}
-        <div className="order-2 lg:order-1 flex flex-col justify-center space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-12">
+        <div className="order-2 lg:order-1 flex flex-col justify-between space-y-6">
           {/* Service Card */}
           <div
             ref={carouselWrapRef}
-            className="relative overflow-hidden rounded-2xl sm:rounded-2xl md:rounded-3xl lg:rounded-3xl xl:rounded-3xl 2xl:rounded-[2.5rem] bg-white shadow-lg p-5 sm:p-6 md:p-7 lg:p-8 xl:p-10 2xl:p-16 min-h-[280px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] xl:min-h-[380px] 2xl:min-h-[550px]"
+            className="group/card relative overflow-hidden rounded-3xl bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-md shadow-lg p-6 sm:p-8 xl:p-10 min-h-[360px] sm:min-h-[320px] lg:min-h-[380px]"
           >
+            {/* Visual Progress Bar */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/5 dark:bg-white/10 z-20">
+              <div
+                className="h-full bg-gradient-to-r from-[#FF6B35] via-[#FF1493] to-[#9D00FF] transition-all duration-700 ease-out shadow-[0_0_8px_rgba(255,20,147,0.5)]"
+                style={{ width: `${((currentIndex + 1) / services.length) * 100}%` }}
+              />
+            </div>
+
             {services.map((service, index) => {
               const Icon = service.icon;
               return (
                 <div
                   key={index}
-                  className={`absolute inset-0 p-5 sm:p-6 md:p-7 lg:p-8 xl:p-10 2xl:p-16 transition-all duration-700 ease-in-out ${
+                  className={`absolute inset-0 p-6 sm:p-8 xl:p-10 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] ${
                     currentIndex === index
-                      ? "opacity-100 translate-x-0"
-                      : index < currentIndex
-                      ? "opacity-0 -translate-x-full"
-                      : "opacity-0 translate-x-full"
+                      ? "opacity-100 translate-x-0 scale-100 rotate-0 blur-0 pointer-events-auto"
+                      : "opacity-0 translate-x-full scale-95 blur-[2px] pointer-events-none"
                   }`}
                 >
                   {/* Icon */}
                   <div
-                    className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-24 2xl:h-24 rounded-xl sm:rounded-xl md:rounded-2xl lg:rounded-2xl xl:rounded-2xl 2xl:rounded-3xl flex items-center justify-center mb-4 sm:mb-4 md:mb-5 lg:mb-5 xl:mb-6 2xl:mb-10 shadow-md"
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-md"
                     style={{
                       background:
-                        "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
+                        "linear-gradient(135deg, #FF6B35 0%, #FF1493 50%, #9D00FF 100%)",
                     }}
                   >
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 2xl:w-12 2xl:h-12 text-white" />
+                    <Icon className="w-6 h-6 text-white" />
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-5xl font-bold text-[#2C2C2C] mb-2 sm:mb-3 md:mb-3 lg:mb-3 xl:mb-4 2xl:mb-6">
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground mb-3 uppercase tracking-wide">
                     {service.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-xs sm:text-sm md:text-base lg:text-base xl:text-lg 2xl:text-3xl text-gray-600 leading-relaxed mb-4 sm:mb-5 md:mb-5 lg:mb-6 xl:mb-7 2xl:mb-10">
+                  <p className="text-xs sm:text-sm md:text-base text-muted-foreground leading-relaxed mb-6 font-medium">
                     {service.description}
                   </p>
 
-                  {/* Learn More Link */}
-                  <button
-                    className="group inline-flex items-center gap-1.5 sm:gap-2 md:gap-2 lg:gap-2 xl:gap-2 2xl:gap-3 text-xs sm:text-sm md:text-base lg:text-base xl:text-lg 2xl:text-2xl font-semibold transition-all duration-300"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
+                  {/* Learn More Button */}
+                  <Link
+                    href={`#contact`}
+                    className="group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full border-2 border-black/10 dark:border-white/20 bg-transparent px-6 py-2.5 text-xs sm:text-sm font-bold text-foreground transition-all duration-500 hover:border-transparent hover:text-white hover:shadow-xl active:scale-95"
                   >
-                    Explore Service
-                    <span className="group-hover:translate-x-1 transition-transform duration-300">
-                      →
+                    <div className="absolute inset-0 translate-y-full bg-gradient-to-r from-[#FF6B35] via-[#FF1493] to-[#9D00FF] transition-transform duration-500 ease-out group-hover/btn:translate-y-0" />
+                    <span className="relative z-10">Inquire Now</span>
+                    <span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-foreground transition-all duration-500 group-hover/btn:bg-white group-hover/btn:text-black group-hover/btn:-rotate-45">
+                      <ChevronRight size={14} />
                     </span>
-                  </button>
+                  </Link>
                 </div>
               );
             })}
@@ -378,18 +366,18 @@ const ServicesOverview = ({
           {/* Navigation Buttons */}
           <div
             ref={navWrapRef}
-            className="flex items-center justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-5 xl:gap-6 2xl:gap-10"
+            className="flex items-center justify-center gap-4"
           >
             <button
               onClick={() => handleManualNavigation('prev')}
-              className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-9 lg:h-9 xl:w-10 xl:h-10 2xl:w-14 2xl:h-14 bg-[#2C2C2C] hover:bg-[#4A4A4A] text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-md active:scale-95"
+              className="w-10 h-10 bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 text-foreground rounded-full flex items-center justify-center transition-all duration-300 hover:bg-white/60 dark:hover:bg-white/15 hover:scale-105 active:scale-95 shadow-sm"
               aria-label="Previous service"
             >
-              <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-9 2xl:h-9" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
 
             {/* Dots Indicator */}
-            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2 lg:gap-2 xl:gap-2 2xl:gap-3">
+            <div className="flex items-center gap-2">
               {services.map((_, index) => (
                 <button
                   key={index}
@@ -400,14 +388,14 @@ const ServicesOverview = ({
                   }}
                   className={`transition-all duration-300 rounded-full ${
                     currentIndex === index
-                      ? "w-3.5 sm:w-4 md:w-5 lg:w-5 xl:w-6 2xl:w-10 h-1.5 sm:h-1.5 md:h-1.5 lg:h-1.5 xl:h-2 2xl:h-3"
-                      : "w-1.5 sm:w-1.5 md:w-1.5 lg:w-1.5 xl:w-2 2xl:w-3 h-1.5 sm:h-1.5 md:h-1.5 lg:h-1.5 xl:h-2 2xl:h-3 bg-gray-300 hover:bg-gray-400"
+                      ? "w-6 h-2"
+                      : "w-2 h-2 bg-black/10 dark:bg-white/15 hover:bg-black/20 dark:hover:bg-white/30"
                   }`}
                   style={
                     currentIndex === index
                       ? {
                           background:
-                            "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
+                            "linear-gradient(135deg, #FF6B35 0%, #FF1493 100%)",
                         }
                       : {}
                   }
@@ -418,10 +406,10 @@ const ServicesOverview = ({
 
             <button
               onClick={() => handleManualNavigation('next')}
-              className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-9 lg:h-9 xl:w-10 xl:h-10 2xl:w-14 2xl:h-14 bg-[#2C2C2C] hover:bg-[#4A4A4A] text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-md active:scale-95"
+              className="w-10 h-10 bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 text-foreground rounded-full flex items-center justify-center transition-all duration-300 hover:bg-white/60 dark:hover:bg-white/15 hover:scale-105 active:scale-95 shadow-sm"
               aria-label="Next service"
             >
-              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-9 2xl:h-9" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>

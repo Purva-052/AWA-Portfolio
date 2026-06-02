@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import styles from "./PreLoader.module.scss";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -22,7 +22,7 @@ interface Particle {
 // Generate particles function
 function generateParticles(): Particle[] {
   if (typeof window === 'undefined') return [];
-  
+
   const isMobile = window.innerWidth < 768;
   const spread = isMobile ? 800 : 1400;
   const radius = isMobile ? 60 : 80;
@@ -55,9 +55,13 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
   const container = useRef<HTMLElement>(null);
   const particleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const logoRef = useRef<HTMLDivElement>(null);
-  
-  // Lazy initialization - function only runs ONCE on mount
-  const [particles] = useState<Particle[]>(() => generateParticles());
+
+  // Initialize empty and populate only on mount to prevent hydration mismatch
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    setParticles(generateParticles());
+  }, []);
 
   useGSAP(
     () => {
@@ -78,8 +82,8 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
 
       // Set logo to hidden
       if (logoRef.current) {
-        gsap.set(logoRef.current, { 
-          scale: 0, 
+        gsap.set(logoRef.current, {
+          scale: 0,
           opacity: 0,
           visibility: "hidden"
         });
@@ -170,7 +174,7 @@ export default function PreLoader({ onComplete }: PreLoaderProps) {
 
       {/* Logo Container */}
       <div className={styles.logoContainer}>
-        <div 
+        <div
           ref={logoRef}
           className={styles.logoSymbol}
           style={{ opacity: 0, transform: "scale(0)", visibility: "hidden" }}

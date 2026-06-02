@@ -5,7 +5,8 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { ExternalLink, Instagram, Facebook, Linkedin } from "lucide-react";
+import { ExternalLink, Instagram, Youtube, Linkedin, Flame } from "lucide-react";
+import { useTheme } from "@/lib/ThemeContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,7 +16,7 @@ interface PortfolioItem {
   title: string;
   category: string;
   description: string;
-  platform?: "instagram" | "facebook" | "linkedin" | "event" | "ad";
+  platform?: "instagram" | "youtube" | "linkedin" | "tiktok";
   metrics?: {
     label: string;
     value: string;
@@ -24,16 +25,15 @@ interface PortfolioItem {
 
 interface PortfolioProps {
   items?: PortfolioItem[];
-  backgroundColor?: string;
 }
 
 const Portfolio = ({
   items: customItems,
-  backgroundColor = "#ffffff",
 }: PortfolioProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [lightboxImage, setLightboxImage] = useState<PortfolioItem | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const { theme } = useTheme();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -45,74 +45,74 @@ const Portfolio = ({
   const defaultItems: PortfolioItem[] = [
     {
       id: 1,
-      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=600&fit=crop",
-      title: "Summer Fashion Campaign",
-      category: "Social Media",
-      description: "Instagram carousel campaign for luxury fashion brand",
-      platform: "instagram",
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop",
+      title: "SaaS Founder Organic Series",
+      category: "TikTok/Shorts",
+      description: "Structured a 30-day vertical content series using curiosity loops that generated huge signups.",
+      platform: "tiktok",
       metrics: [
-        { label: "Reach", value: "2.5M" },
-        { label: "Engagement", value: "18.5%" },
+        { label: "Reach", value: "1.8M" },
+        { label: "Conversions", value: "12K+" },
       ],
     },
     {
       id: 2,
-      image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800&h=600&fit=crop",
-      title: "Tech Product Launch",
-      category: "Digital Ads",
-      description: "Paid advertising campaign for SaaS product",
-      platform: "ad",
+      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=600&fit=crop",
+      title: "Ecom Brand Apparel Launch",
+      category: "Instagram Reels",
+      description: "Paced product showcases with custom editing sound-fx that drove organic checkouts.",
+      platform: "instagram",
       metrics: [
-        { label: "CTR", value: "8.2%" },
-        { label: "Conversions", value: "1,200+" },
+        { label: "Reach", value: "2.2M" },
+        { label: "Direct ROI", value: "380%" },
       ],
     },
     {
       id: 3,
-      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
-      title: "Food Festival Event",
-      category: "Events",
-      description: "Brand activation at annual food festival",
-      platform: "event",
+      image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800&h=600&fit=crop",
+      title: "Tech Channel Editing",
+      category: "YouTube Explainer",
+      description: "Optimized click-through rate with high-contrast thumbnails and visual pacing cuts.",
+      platform: "youtube",
       metrics: [
-        { label: "Attendees", value: "5,000+" },
-        { label: "Samples", value: "10K+" },
+        { label: "Views", value: "850K" },
+        { label: "CTR Boost", value: "+11.2%" },
       ],
     },
     {
       id: 4,
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop",
-      title: "B2B LinkedIn Series",
-      category: "Social Media",
-      description: "Thought leadership content for enterprise clients",
-      platform: "linkedin",
+      image: "https://images.unsplash.com/photo-1557838923-2985c318be48?w=800&h=600&fit=crop",
+      title: "Fintech App Hook Strategy",
+      category: "TikTok/Shorts",
+      description: "Hooked scrolling viewers in the first 2 seconds using bold text layouts and transitions.",
+      platform: "tiktok",
       metrics: [
-        { label: "Impressions", value: "850K" },
-        { label: "Leads", value: "340" },
+        { label: "Views", value: "3.1M" },
+        { label: "App Installs", value: "45K" },
       ],
     },
     {
       id: 5,
-      image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&h=600&fit=crop",
-      title: "Brand Awareness Video",
-      category: "Content Creation",
-      description: "Cinematic brand story for corporate rebrand",
-      platform: "facebook",
+      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+      title: "Executive Thought Leadership",
+      category: "LinkedIn Carousels",
+      description: "Formatted complex company frameworks into clean, swipeable PDF presentation pages.",
+      platform: "linkedin",
       metrics: [
-        { label: "Views", value: "3.2M" },
-        { label: "Shares", value: "45K" },
+        { label: "Impressions", value: "420K" },
+        { label: "Warm Leads", value: "340" },
       ],
     },
     {
       id: 6,
-      image: "https://images.unsplash.com/photo-1557838923-2985c318be48?w=800&h=600&fit=crop",
-      title: "Influencer Collaboration",
-      category: "Influencer Marketing",
-      description: "Multi-platform influencer partnership campaign",
+      image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&h=600&fit=crop",
+      title: "Organic Skincare Promotion",
+      category: "Instagram Reels",
+      description: "Aesthetic lifestyle styling utilizing trending reels audios to expand organic reach.",
       platform: "instagram",
       metrics: [
-        { label: "Reach", value: "1.8M" },
-        { label: "ROI", value: "420%" },
+        { label: "Reach", value: "1.5M" },
+        { label: "Engagement", value: "18.5%" },
       ],
     },
   ];
@@ -128,11 +128,13 @@ const Portfolio = ({
   const getPlatformIcon = (platform?: string) => {
     switch (platform) {
       case "instagram":
-        return <Instagram className="w-3 h-3 sm:w-4 sm:h-4" />;
-      case "facebook":
-        return <Facebook className="w-3 h-3 sm:w-4 sm:h-4" />;
+        return <Instagram className="w-4 h-4" />;
+      case "tiktok":
+        return <Flame className="w-4 h-4 text-[#00f2fe]" />;
+      case "youtube":
+        return <Youtube className="w-4 h-4" />;
       case "linkedin":
-        return <Linkedin className="w-3 h-3 sm:w-4 sm:h-4" />;
+        return <Linkedin className="w-4 h-4" />;
       default:
         return null;
     }
@@ -146,7 +148,7 @@ const Portfolio = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Mobile animations - Simplified for performance
+  // Mobile animations
   useEffect(() => {
     if (!isMobile || hasAnimatedRef.current) return;
 
@@ -188,7 +190,7 @@ const Portfolio = ({
     return () => observer.disconnect();
   }, [isMobile]);
 
-  // Desktop animations - Optimized
+  // Desktop animations
   useGSAP(
     () => {
       if (isMobile || hasAnimatedRef.current) return;
@@ -238,62 +240,59 @@ const Portfolio = ({
   return (
     <>
       <div
+        id="portfolio"
         ref={containerRef}
-        className="relative w-full py-8 sm:py-10 md:py-12 lg:py-14 xl:py-16 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 overflow-hidden"
-        style={{ backgroundColor }}
+        className="relative w-full py-16 sm:py-20 lg:py-24 px-4 sm:px-6 md:px-8 lg:px-12 bg-background transition-colors duration-500 overflow-hidden border-t border-black/5 dark:border-white/5"
       >
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full blur-3xl" />
+        {/* Decorative background gradients */}
+        <div className="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none">
+          <div className="absolute top-20 left-10 w-[400px] h-[400px] bg-gradient-to-br from-pink-500 to-indigo-500 rounded-full blur-[120px]" />
+          <div className="absolute bottom-20 right-10 w-[400px] h-[400px] bg-gradient-to-br from-amber-500 to-cyan-500 rounded-full blur-[120px]" />
         </div>
 
-        <div className="relative max-w-[1400px] 2xl:max-w-[1800px] mx-auto">
+        <div className="relative max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-6 sm:mb-7 md:mb-8 lg:mb-10">
+          <div className="text-center mb-10">
             <h2
               ref={titleRef}
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-2 sm:mb-3 md:mb-4"
+              className="text-3xl sm:text-4xl lg:text-5xl font-black mb-3 tracking-tight uppercase"
               style={{
                 background:
-                  "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
+                  "linear-gradient(135deg, #FF6B35 0%, #FF1493 50%, #9D00FF 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
-                fontFamily: "'Bebas Neue', 'Arial Black', sans-serif",
-                letterSpacing: "0.02em",
               }}
             >
-              OUR WORK SPEAKS FOR ITSELF
+              Viral Proof & Metrics
             </h2>
             <p
               ref={subtitleRef}
-              className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl max-w-2xl mx-auto"
-              style={{ fontFamily: "'Inter', sans-serif" }}
+              className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto font-medium"
             >
-              Explore our portfolio of successful campaigns that delivered real results
+              Explore actual results and campaigns we ran that shattered reach benchmarks.
             </p>
           </div>
 
           {/* Category Filters */}
           <div
             ref={filtersRef}
-            className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-7 md:mb-8 lg:mb-10"
+            className="flex flex-wrap justify-center gap-2 mb-10"
           >
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-2 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 lg:py-2 rounded-full text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-wider transition-all duration-300 ${
+                className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
                   selectedCategory === category
-                    ? "text-white shadow-lg transform scale-105"
-                    : "bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white"
+                    ? "text-white shadow-md transform scale-105"
+                    : "bg-white/40 dark:bg-white/5 text-muted-foreground border border-black/5 dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/10 hover:text-foreground"
                 }`}
                 style={
                   selectedCategory === category
                     ? {
                         background:
-                          "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
+                          "linear-gradient(135deg, #FF6B35 0%, #FF1493 100%)",
                       }
                     : {}
                 }
@@ -306,21 +305,16 @@ const Portfolio = ({
           {/* Portfolio Grid */}
           <div
             ref={gridRef}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-7"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className="group relative bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:transform hover:scale-[1.01] hover:shadow-xl border border-white/10"
+                className="group relative bg-white/40 dark:bg-white/5 rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 hover:transform hover:scale-[1.02] hover:shadow-xl border border-black/5 dark:border-white/10"
                 onClick={() => setLightboxImage(item)}
-                style={{
-                  willChange: "transform",
-                  transform: "translate3d(0, 0, 0)",
-                  background:"#0a0a0a",
-                }}
               >
                 {/* Image Container */}
-                <div className="relative aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">
                   <Image
                     src={item.image}
                     alt={item.title}
@@ -330,60 +324,53 @@ const Portfolio = ({
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
-                  
-                  {/* Platform Icon - Smaller */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-85 transition-opacity duration-300" />
+
+                  {/* Platform Icon */}
                   {item.platform && (
-                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
+                    <div className="absolute top-4 right-4 w-9 h-9 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white">
                       {getPlatformIcon(item.platform)}
                     </div>
                   )}
 
-                  {/* Expand Icon - Smaller */}
-                  <div className="absolute top-2 sm:top-3 left-2 sm:left-3 w-7 h-7 sm:w-8 sm:h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                  {/* Expand Icon */}
+                  <div className="absolute top-4 left-4 w-9 h-9 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <ExternalLink className="w-4 h-4" />
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-1.5 sm:p-2 md:p-2.5">
-                  <div className="mb-0.5 sm:mb-1">
+                <div className="p-6">
+                  <div className="mb-2">
                     <span
-                      className="inline-block px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider"
+                      className="inline-block px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider text-white"
                       style={{
                         background:
-                          "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
+                          "linear-gradient(135deg, #FF6B35 0%, #FF1493 100%)",
                       }}
                     >
                       {item.category}
                     </span>
                   </div>
 
-                  <h3 className="text-white text-[10px] sm:text-xs md:text-sm font-bold mb-0.5 line-clamp-1">
+                  <h3 className="text-foreground text-lg font-black mb-1 line-clamp-1 uppercase">
                     {item.title}
                   </h3>
-                  <p className="text-gray-400 text-[9px] sm:text-[10px] mb-1.5 sm:mb-2 line-clamp-2">
+                  <p className="text-muted-foreground text-xs leading-relaxed mb-4 line-clamp-2 font-medium">
                     {item.description}
                   </p>
 
-                  {/* Metrics */}
+                  {/* Metrics Row */}
                   {item.metrics && (
-                    <div className="grid grid-cols-2 gap-1">
+                    <div className="grid grid-cols-2 gap-3">
                       {item.metrics.map((metric, idx) => (
-                        <div key={idx} className="text-center p-1 sm:p-1.5 bg-white/5 rounded-lg">
+                        <div key={idx} className="text-center p-3 bg-white/60 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl">
                           <div
-                            className="text-xs sm:text-sm md:text-base font-black mb-0"
-                            style={{
-                              background:
-                                "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
-                              WebkitBackgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                              backgroundClip: "text",
-                            }}
+                            className="text-lg font-black bg-gradient-to-r from-[#FF6B35] to-[#9D00FF] bg-clip-text text-transparent"
                           >
                             {metric.value}
                           </div>
-                          <div className="text-gray-400 text-[8px] sm:text-[9px]">
+                          <div className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
                             {metric.label}
                           </div>
                         </div>
@@ -400,22 +387,22 @@ const Portfolio = ({
       {/* Lightbox Modal */}
       {lightboxImage && (
         <div
-          className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
           onClick={() => setLightboxImage(null)}
         >
           <div
-            className="relative max-w-5xl w-full bg-white/10 backdrop-blur-xl rounded-3xl overflow-hidden"
+            className="relative max-w-4xl w-full bg-white dark:bg-zinc-950 border border-black/5 dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl animate-fadeIn"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setLightboxImage(null)}
-              className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 rounded-full flex items-center justify-center text-foreground hover:bg-black/10 dark:hover:bg-white/20 transition-colors"
             >
               ✕
             </button>
 
             <div className="grid md:grid-cols-2 gap-0">
-              <div className="relative aspect-square md:aspect-auto">
+              <div className="relative aspect-square md:aspect-auto min-h-[300px]">
                 <Image
                   src={lightboxImage.image}
                   alt={lightboxImage.title}
@@ -427,41 +414,34 @@ const Portfolio = ({
                 />
               </div>
 
-              <div className="p-8 sm:p-10 md:p-12 flex flex-col justify-center">
+              <div className="p-8 sm:p-10 flex flex-col justify-center gap-4">
                 <span
-                  className="inline-block px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider mb-6 w-fit"
+                  className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white w-fit"
                   style={{
                     background:
-                      "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
+                      "linear-gradient(135deg, #FF6B35 0%, #FF1493 100%)",
                   }}
                 >
                   {lightboxImage.category}
                 </span>
 
-                <h3 className="text-white text-3xl sm:text-4xl font-black mb-4">
+                <h3 className="text-foreground text-2xl sm:text-3xl font-black uppercase leading-tight">
                   {lightboxImage.title}
                 </h3>
-                <p className="text-gray-300 text-lg mb-8">
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed font-semibold">
                   {lightboxImage.description}
                 </p>
 
                 {lightboxImage.metrics && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 mt-2">
                     {lightboxImage.metrics.map((metric, idx) => (
-                      <div key={idx} className="p-5 bg-white/5 rounded-xl">
+                      <div key={idx} className="p-4 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl">
                         <div
-                          className="text-3xl font-black mb-2"
-                          style={{
-                            background:
-                              "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                          }}
+                          className="text-2xl font-black bg-gradient-to-r from-[#FF6B35] to-[#FF1493] bg-clip-text text-transparent"
                         >
                           {metric.value}
                         </div>
-                        <div className="text-gray-400 text-sm uppercase tracking-wider">
+                        <div className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
                           {metric.label}
                         </div>
                       </div>
@@ -478,13 +458,15 @@ const Portfolio = ({
         @keyframes fadeIn {
           from {
             opacity: 0;
+            transform: scale(0.95);
           }
           to {
             opacity: 1;
+            transform: scale(1);
           }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </>

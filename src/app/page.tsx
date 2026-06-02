@@ -3,12 +3,14 @@
 import { useEffect } from "react";
 import AboutUs from "@/components/AboutUs/AboutUs";
 import { Hero } from "@/components/Hero/Hero";
-// import MainLayout from "@/components/layout/MainLayout";
+import MainLayout from "@/components/layout/MainLayout";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import WhyChooseAWA from "@/components/WhyChooseUs/whyChooseUs";
 import ServicesOverview from "@/components/services/overView";
 import Portfolio from "@/components/Portfolio/portfolio";
 import ContactFooter from "@/components/Contact/contact";
+import HowWeWork from "@/components/Our_Process/ourProcess";
+import Testimonials from "@/components/Testimonials/testimonials";
 
 export default function HomePage() {
   useEffect(() => {
@@ -39,13 +41,15 @@ export default function HomePage() {
   }, []);
 
   return (
-    <>
+    <MainLayout>
       <Hero />
       <AboutUs />
-      <WhyChooseAWA/>
-      <ServicesOverview/>
-      <Portfolio/>
-      <ContactFooter/>
-    </>
+      <WhyChooseAWA />
+      <ServicesOverview />
+      <Portfolio />
+      <HowWeWork />
+      <Testimonials />
+      <ContactFooter />
+    </MainLayout>
   );
 }

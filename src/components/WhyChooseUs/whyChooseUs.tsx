@@ -1,243 +1,227 @@
 "use client";
 
-import Image from "next/image";
-import React, { useRef } from "react";
-import { useGSAP } from "@gsap/react";
+import React, { useRef, useState, useEffect } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import { BarChart3, Layers, Zap, Eye, Globe, Users } from "lucide-react";
 
-interface WhyChooseAWAProps {
-  image?: string;
-  sectionHeading?: string;
-  heading?: string;
-  highlightedText?: string;
-  points?: string[];
-}
+gsap.registerPlugin(ScrollTrigger);
 
-const WhyChooseAWA = ({
-  image = "/whyChooseUs.jpg",
-  sectionHeading = "Why Choose AWA Media?",
-  heading = "Your Growth is Our",
-  highlightedText = "Priority",
-  points = [
-    "Local expertise in Ahmedabad with a global outlook.",
-    "Tailored strategies for every business need.",
-    "Creative and data-driven approach.",
-    "Proven track record of delivering ROI-driven campaigns.",
-  ],
-}: WhyChooseAWAProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const sectionHeadingRef = useRef<HTMLHeadingElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const underlineRef = useRef<HTMLDivElement>(null);
-  const pointsRef = useRef<HTMLUListElement>(null);
+const GRADIENT = "linear-gradient(135deg,#FF6B35,#FF1493,#9D00FF)";
 
-  useGSAP(() => {
-    const container = containerRef.current;
-    const sectionHeadingEl = sectionHeadingRef.current;
-    const imageEl = imageRef.current;
-    const titleEl = titleRef.current;
-    const underlineEl = underlineRef.current;
-    const pointsList = pointsRef.current;
+const gradientText = {
+  background: GRADIENT,
+  WebkitBackgroundClip: "text" as const,
+  WebkitTextFillColor: "transparent",
+};
 
-    if (!container || !imageEl || !titleEl || !underlineEl || !pointsList) return;
+const features = [
+  {
+    title: "Hook Engineering",
+    desc: "We analyze the first 3 seconds of every video to design visual and verbal hooks that stop the user's scroll instantly.",
+    icon: Zap,
+  },
+  {
+    title: "Retention-Focused Editing",
+    desc: "Cuts, zooms, graphical overlays, sound effects, and text animations engineered specifically to maximize viewer retention.",
+    icon: Layers,
+  },
+  {
+    title: "Algorithmic Vetting",
+    desc: "Aligning video structures, trending audio options, and meta descriptions to match platform algorithms for organic push.",
+    icon: BarChart3,
+  },
+  {
+    title: "Analytics-First Auditing",
+    desc: "Deep analysis of audience drop-off points, CTRs, and click rates to double-down on the highest performing assets.",
+    icon: Eye,
+  },
+  {
+    title: "Omnichannel Syndication",
+    desc: "Optimizing content to publish natively across Instagram Reels, TikTok, YouTube Shorts, and LinkedIn simultaneously.",
+    icon: Globe,
+  },
+  {
+    title: "A-List Creative Team",
+    desc: "Dedicated scriptwriters, visual editors, and channel managers aligned directly with your brand's growth goals.",
+    icon: Users,
+  },
+];
 
-    const pointItems = Array.from(pointsList.querySelectorAll("li"));
+const WhyChooseUs = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
-    // ✅ Initial state
-    if (sectionHeadingEl) {
-      gsap.set(sectionHeadingEl, { opacity: 0, y: 20 });
-    }
-    gsap.set(imageEl, { opacity: 0, y: 40, scale: 0.95 });
-    gsap.set(titleEl, { opacity: 0, y: 25 });
-    gsap.set(underlineEl, { scaleX: 0, transformOrigin: "left center" });
-    gsap.set(pointItems, { opacity: 0, y: 18 });
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
-    // ✅ Timeline
-    const tl = gsap.timeline({ paused: true });
+  // Mobile Animation (Intersection Observer)
+  useEffect(() => {
+    if (!isMobile) return;
 
-    // ✅ Heading first - FASTER
-    if (sectionHeadingEl) {
-      tl.to(sectionHeadingEl, {
-        opacity: 1,
-        y: 0,
-        duration: 0.35,
-        ease: "power3.out",
-      });
-    }
+    const header = headerRef.current;
+    const cards = cardsRef.current ? Array.from(cardsRef.current.children) : [];
+    if (!header || !cards.length) return;
 
-    // ✅ Image - FASTER
-    tl.to(
-      imageEl,
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.45,
-        ease: "power3.out",
-      },
-      sectionHeadingEl ? "-=0.2" : 0
-    );
+    gsap.set(header, { opacity: 0, y: 30 });
+    gsap.set(cards, { opacity: 0, y: 30 });
 
-    // ✅ Title + underline - FASTER
-    tl.to(
-      titleEl,
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.35,
-        ease: "power3.out",
-      },
-      "-=0.3"
-    ).to(
-      underlineEl,
-      {
-        scaleX: 1,
-        duration: 0.3,
-        ease: "power2.out",
-      },
-      "-=0.25"
-    );
-
-    // ✅ Points - FASTER
-    tl.to(
-      pointItems,
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.3,
-        ease: "back.out(1.2)",
-        stagger: 0.08,
-      },
-      "-=0.15"
-    );
-
-    // ✅ Trigger - LOWER THRESHOLD for earlier trigger
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) tl.play();
-          else tl.reverse();
+          if (entry.isIntersecting) {
+            gsap.to(entry.target, {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              overwrite: true
+            });
+            observer.unobserve(entry.target);
+          }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     );
 
-    observer.observe(container);
+    observer.observe(header);
+    cards.forEach(card => observer.observe(card));
 
-    return () => {
-      observer.disconnect();
-      tl.kill();
-    };
-  }, []);
+    return () => observer.disconnect();
+  }, [isMobile]);
+
+  // Desktop Animation (ScrollTrigger)
+  useGSAP(
+    () => {
+      if (isMobile) return;
+
+      const header = headerRef.current;
+      const cards = cardsRef.current ? Array.from(cardsRef.current.children) : [];
+      if (!header || !cards.length) return;
+
+      // header slides up
+      gsap.set(header, { opacity: 0, y: 30 });
+      gsap.to(header, {
+        opacity: 1,
+        y: 0,
+        duration: 0.55,
+        ease: "power2.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 82%", once: true },
+      });
+
+      // cards: scale + fade stagger
+      gsap.set(cards, { opacity: 0, y: 36, scale: 0.95 });
+      gsap.to(cards, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.5,
+        stagger: 0.08,
+        ease: "back.out(1.3)",
+        scrollTrigger: { trigger: cardsRef.current, start: "top 85%", once: true },
+      });
+
+      // icon badges: bounce in
+      const icons = cardsRef.current?.querySelectorAll("[data-icon]");
+      if (icons) {
+        gsap.set(icons, { scale: 0, rotation: -12 });
+        gsap.to(icons, {
+          scale: 1,
+          rotation: 0,
+          duration: 0.45,
+          stagger: 0.08,
+          ease: "back.out(2)",
+          delay: 0.3,
+          scrollTrigger: { trigger: cardsRef.current, start: "top 85%", once: true },
+        });
+      }
+
+      // blobs: pulse
+      const blobs = cardsRef.current?.querySelectorAll("[data-blob]");
+      if (blobs) {
+        const mm = gsap.matchMedia();
+        mm.add("(min-width: 768px)", () => {
+          blobs.forEach((blob, i) => {
+            gsap.to(blob, {
+              scale: 1.15,
+              opacity: 0.22,
+              duration: 2.2 + i * 0.3,
+              repeat: -1,
+              yoyo: true,
+              ease: "sine.inOut",
+              delay: i * 0.4,
+            });
+          });
+        });
+      }
+    },
+    { scope: sectionRef, dependencies: [isMobile] }
+  );
 
   return (
-    <div
-      ref={containerRef}
-      className="container mx-auto relative py-12 sm:py-16 md:py-8 px-4 sm:px-6 overflow-hidden"
+    <section
+      ref={sectionRef}
+      className="w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 bg-background transition-colors duration-500 border-t border-black/5 dark:border-white/5"
     >
-      <div className="text-center mb-8 sm:mb-10 md:mb-12">
-        <h2
-          ref={sectionHeadingRef}
-          className="text-black font-bold text-[22px] sm:text-[28px] md:text-[32px] lg:text-[36px] leading-[28px] sm:leading-[34px] md:leading-[38px]"
-        >
-          Why Choose{" "}
+      <div className="max-w-6xl mx-auto">
+
+        {/* Header */}
+        <div ref={headerRef} className="text-center mb-12">
           <span
-            style={{
-              background:
-                "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
+            className="inline-block px-4 py-1.5 text-xs font-bold uppercase rounded-full text-white mb-3"
+            style={{ background: GRADIENT }}
           >
-            AWA Media?
+            Our Blueprint
           </span>
-        </h2>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-4 items-center justify-center place-items-center">
-        {/*  Image */}
-        <div
-          ref={imageRef}
-          className="relative w-full max-w-[300px] sm:max-w-[380px] md:max-w-[460px] aspect-square rounded-full overflow-hidden shadow-xl lg:shadow-2xl"
-          style={{
-            willChange: "transform, opacity",
-            backfaceVisibility: "hidden",
-            transform: "translateZ(0)",
-          }}
-        >
-          <Image
-            src={image}
-            alt="AWA Media - Your Growth Partner"
-            fill
-            quality={80}
-            loading="lazy"
-            sizes="(max-width: 640px) 300px, (max-width: 768px) 380px, 460px"
-            className="object-cover"
-          />
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-3 tracking-tight">
+            Built for <span style={gradientText}>Virality</span>
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto font-medium">
+            We don&apos;t post and hope. We execute a meticulous, data-driven workflow designed to turn viewers into active community members.
+          </p>
         </div>
 
-        <div className="flex flex-col justify-center gap-6 sm:gap-8 lg:gap-10 p-2 sm:p-4 text-center lg:text-left">
-          <div className="flex flex-col gap-3 sm:gap-4 items-center lg:items-start">
-            <h3
-              ref={titleRef}
-              className="text-black font-bold text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] leading-[28px] sm:leading-[32px] md:leading-[36px] lg:leading-[40px]"
-              style={{
-                willChange: "transform, opacity",
-                backfaceVisibility: "hidden",
-                transform: "translateZ(0)",
-              }}
-            >
-              {heading}{" "}
-              <span
-                className="font-bold"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
+        {/* 3-column grid */}
+        <div ref={cardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((f, i) => {
+            const IconComponent = f.icon;
+            return (
+              <div
+                key={i}
+                className="group bg-white/40 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-black/5 dark:border-white/10 p-6 hover:shadow-xl hover:border-black/10 dark:hover:border-white/20 hover:bg-white/60 dark:hover:bg-white/10 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden cursor-default"
               >
-                {highlightedText}
-              </span>
-            </h3>
-
-            <div
-              ref={underlineRef}
-              className="w-[60px] sm:w-[70px] md:w-[80px] h-[3px] sm:h-[4px] bg-[#021639]"
-              style={{
-                willChange: "transform",
-                backfaceVisibility: "hidden",
-                transform: "translateZ(0)",
-              }}
-            />
-          </div>
-
-          <ul
-            ref={pointsRef}
-            className="space-y-3 sm:space-y-4 text-left max-w-[520px] mx-auto lg:mx-0"
-          >
-            {points.map((point, index) => (
-              <li key={index} className="flex items-start gap-3 sm:gap-4">
-                <span
-                  className="flex-shrink-0 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full mt-2"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #FF6B35 0%, #FF1493 25%, #9B59B6 50%, #3498DB 75%, #2ECC71 100%)",
-                  }}
+                {/* Corner gradient blob */}
+                <div
+                  data-blob
+                  className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-10 pointer-events-none"
+                  style={{ background: GRADIENT }}
                 />
-                <span className="text-black text-[14px] sm:text-[16px] md:text-[18px] leading-relaxed">
-                  {point}
-                </span>
-              </li>
-            ))}
-          </ul>
+
+                <div className="relative z-10">
+                  {/* Icon badge */}
+                  <div
+                    data-icon
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#FF6B35] to-[#FF1493] shadow-[0_4px_12px_rgba(255,107,53,0.3)]"
+                  >
+                    <IconComponent className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-base font-black text-foreground mb-2 uppercase">{f.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-semibold">{f.desc}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
-export default WhyChooseAWA;
+export default WhyChooseUs;
