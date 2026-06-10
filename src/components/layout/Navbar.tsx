@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, ArrowRight, Sun, Moon } from "lucide-react";
+import { Menu, X, Sparkles, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { useTheme } from "@/lib/ThemeContext";
 
 const navLinks = [
@@ -14,6 +15,7 @@ const navLinks = [
     { name: "About", href: "/#about" },
     { name: "Services", href: "/#services" },
     { name: "Portfolio", href: "/#portfolio" },
+    { name: "Journey", href: "/#journey" },
     { name: "Contact", href: "/#contact" },
 ];
 
@@ -24,7 +26,31 @@ export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
 
+    const handleMagnetMove = (e: React.MouseEvent<HTMLElement>) => {
+        const item = e.currentTarget;
+        const rect = item.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        gsap.to(item, {
+            x: x * 0.3,
+            y: y * 0.3,
+            duration: 0.2,
+            ease: "power2.out"
+        });
+    };
+
+    const handleMagnetLeave = (e: React.MouseEvent<HTMLElement>) => {
+        gsap.to(e.currentTarget, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: "elastic.out(1.1, 0.6)"
+        });
+    };
+
+
     useEffect(() => {
+        gsap.registerPlugin(ScrollToPlugin);
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 20);
         };
@@ -44,9 +70,10 @@ export default function Navbar() {
             const element = document.getElementById(targetHash!);
             if (element) {
                 const offset = 80;
+                const elementPosition = element.getBoundingClientRect().top + window.scrollY;
                 gsap.to(window, {
                     duration: 1.2,
-                    scrollTo: { y: element.offsetTop - offset, autoKill: true },
+                    scrollTo: { y: elementPosition - offset, autoKill: true },
                     ease: "power4.inOut",
                 });
             }
@@ -66,88 +93,87 @@ export default function Navbar() {
     return (
         <header
             style={{ zIndex: 1000 }}
-            className={`fixed top-0 left-0 right-0 transition-all duration-500 pointer-events-none ${isScrolled ? "py-4 md:py-3" : "py-8 md:py-6"
-                }`}
+            className="fixed top-0 left-0 right-0 h-24 flex items-center justify-center pointer-events-none z-[1000]"
         >
-            <div className="container mx-auto px-4 sm:px-6 pointer-events-auto">
-                <nav className={`mx-auto flex max-w-5xl items-center justify-between rounded-full border px-5 py-2 backdrop-blur-md transition-all duration-500 shadow-2xl ${
+            <div 
+                className={`w-full max-w-7xl mx-4 sm:mx-6 lg:mx-8 px-4 sm:px-6 py-2.5 flex items-center justify-between pointer-events-auto rounded-2xl md:rounded-3xl border border-border/60 bg-background/70 backdrop-blur-md transition-all duration-300 ${
                     isScrolled 
-                        ? "bg-white/80 dark:bg-black/80 border-black/5 dark:border-white/5 scale-[0.98]" 
-                        : "bg-white/40 dark:bg-black/40 border-black/10 dark:border-white/10 scale-100"
-                    }`}>
-                    {/* Logo */}
-                    <Link
-                        href="/"
-                        onClick={(e) => handleLinkClick(e, "/")}
-                        className="flex items-center gap-3 group relative z-10"
+                        ? "shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] translate-y-2 bg-background/80" 
+                        : "translate-y-4"
+                }`}
+            >
+                {/* Left - Logo */}
+                <Link
+                    href="/"
+                    onClick={(e) => handleLinkClick(e, "/")}
+                    onMouseMove={handleMagnetMove}
+                    onMouseLeave={handleMagnetLeave}
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-muted/40 transition-colors"
+                >
+                    <div className="relative w-6 h-6 overflow-hidden">
+                        <Image
+                            src="/logo.png"
+                            alt="AWA"
+                            fill
+                            className="object-contain dark:brightness-110"
+                        />
+                    </div>
+                    <span className="font-heading text-base font-black tracking-tight uppercase text-foreground">
+                        AWA
+                    </span>
+                </Link>
+
+                {/* Center - Links (Desktop) */}
+                <div className="hidden md:flex items-center gap-1.5">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.name}
+                            href={link.href}
+                            onClick={(e) => handleLinkClick(e, link.href)}
+                            className="px-4 py-2 rounded-xl font-bold tracking-wider text-[11px] uppercase text-foreground/70 hover:text-primary hover:bg-muted/40 transition-all duration-200 relative group overflow-hidden"
+                        >
+                            <span className="relative z-10">{link.name}</span>
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Right - Actions & Mobile Toggle */}
+                <div className="flex items-center gap-3">
+                    {/* Theme Toggle Button */}
+                    <button
+                        onClick={toggleTheme}
+                        onMouseMove={handleMagnetMove}
+                        onMouseLeave={handleMagnetLeave}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-border/80 text-foreground hover:bg-muted/50 transition-colors"
+                        aria-label="Toggle theme"
                     >
-                        <div className="relative w-8 h-8 md:w-9 md:h-9 overflow-hidden rounded-lg">
-                            <Image
-                                src="/logo.png"
-                                alt="AWA"
-                                fill
-                                className="object-contain transition-transform duration-500 group-hover:scale-110 dark:brightness-110"
-                            />
-                        </div>
-                        <span className="text-lg md:text-xl font-black tracking-tighter text-black dark:text-white uppercase italic">
-                            AWA
-                        </span>
+                        {theme === "dark" ? (
+                            <Sparkles size={15} className="text-foreground fill-foreground/20 animate-pulse" />
+                        ) : (
+                            <Moon size={15} className="text-foreground fill-foreground/20" />
+                        )}
+                    </button>
+
+                    {/* CTA */}
+                    <Link
+                        href="/#contact"
+                        onClick={(e) => handleLinkClick(e, "/#contact")}
+                        onMouseMove={handleMagnetMove}
+                        onMouseLeave={handleMagnetLeave}
+                        className="hidden sm:inline-flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-[#FF6B35] via-[#FF1493] to-[#9B59B6] text-white font-black text-xs uppercase rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-[0_0_20px_rgba(255,20,147,0.4)] hover:scale-[1.03] active:scale-95"
+                    >
+                        Get Started
                     </Link>
 
-                    {/* Desktop Nav */}
-                    <div className="hidden md:flex items-center gap-6 lg:gap-10">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                onClick={(e) => handleLinkClick(e, link.href)}
-                                className="text-sm font-semibold text-black/60 dark:text-white/60 transition-all hover:text-black dark:hover:text-white relative group py-2 h-9 flex items-center overflow-hidden block"
-                            >
-                                <div className="relative h-5 overflow-hidden">
-                                    <div className="flex flex-col transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-translate-y-5">
-                                        <span className="h-5 leading-5 flex items-center justify-center text-black/70 dark:text-white/70">{link.name}</span>
-                                        <span className="h-5 leading-5 flex items-center justify-center text-black dark:text-white">{link.name}</span>
-                                    </div>
-                                </div>
-                                <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#FF6B35] to-[#2ECC71] transition-all duration-300 group-hover:w-full" />
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* CTA & Theme Toggle */}
-                    <div className="flex items-center gap-3 relative z-10">
-                        {/* Theme Toggle Button */}
-                        <button
-                            onClick={toggleTheme}
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-black dark:text-white backdrop-blur-sm transition-all duration-300 hover:bg-black/10 dark:hover:bg-white/10 hover:scale-105 active:scale-95"
-                            aria-label="Toggle theme"
-                        >
-                            {theme === "dark" ? (
-                                <Sun size={18} className="text-amber-400 animate-spin-slow" />
-                            ) : (
-                                <Moon size={18} className="text-indigo-600" />
-                            )}
-                        </button>
-
-                        <Link
-                            href="/#contact"
-                            onClick={(e) => handleLinkClick(e, "/#contact")}
-                            className="hidden sm:flex items-center gap-2 rounded-full bg-gradient-to-r from-[#FF6B35] via-[#FF1493] to-[#9B59B6] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,20,147,0.4)] hover:scale-[1.03] active:scale-95"
-                        >
-                            Get Started
-                            <ArrowRight size={14} strokeWidth={3} />
-                        </Link>
-
-                        {/* Mobile Toggle */}
-                        <button
-                            className="md:hidden flex h-10 w-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-black dark:text-white backdrop-blur-sm transition-all hover:bg-black/10 dark:hover:bg-white/10"
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            aria-label="Toggle menu"
-                        >
-                            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                        </button>
-                    </div>
-                </nav>
+                    {/* Mobile Toggle */}
+                    <button
+                        className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-border/80 text-foreground hover:bg-muted/50"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle menu"
+                    >
+                        {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Menu Overlay */}
@@ -159,50 +185,51 @@ export default function Navbar() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-md z-[9999998] md:hidden pointer-events-auto"
+                            className="fixed inset-0 bg-background/80 backdrop-blur-md z-[9999998] md:hidden pointer-events-auto"
                         />
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                            className="fixed inset-x-6 top-[110px] z-[9999999] md:hidden pointer-events-auto"
+                            initial={{ opacity: 0, x: "100%" }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: "100%" }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="fixed top-0 right-0 bottom-0 w-80 bg-background border-l border-border z-[9999999] md:hidden pointer-events-auto p-8 flex flex-col justify-between"
                         >
-                            <div className="overflow-hidden rounded-[3rem] border border-black/10 dark:border-white/10 bg-white/95 dark:bg-black/95 p-10 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                                <div className="flex flex-col gap-8">
-                                    {navLinks.map((link, idx) => (
-                                        <motion.div
-                                            key={link.name}
-                                            initial={{ opacity: 0, x: -30 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: idx * 0.08, ease: "easeOut" }}
-                                        >
-                                            <Link
-                                                href={link.href}
-                                                onClick={(e) => handleLinkClick(e, link.href)}
-                                                className="text-5xl font-black uppercase tracking-tighter text-black/20 dark:text-white/30 transition-all hover:text-black dark:hover:text-white hover:translate-x-3 inline-block active:scale-95"
-                                            >
-                                                {link.name}
-                                            </Link>
-                                        </motion.div>
-                                    ))}
-
+                            <div className="flex flex-col gap-6 pt-16">
+                                <div className="border-b border-border pb-4 mb-2 flex items-center justify-between">
+                                    <span className="font-heading text-lg font-black uppercase text-foreground">Menu</span>
+                                    <button
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="h-8 w-8 flex items-center justify-center rounded-full border border-border text-foreground"
+                                    >
+                                        <X size={15} />
+                                    </button>
+                                </div>
+                                {navLinks.map((link, idx) => (
                                     <motion.div
-                                        className="mt-6 pt-10 border-t border-black/5 dark:border-white/5"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.4 }}
+                                        key={link.name}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
                                     >
                                         <Link
-                                            href="/#contact"
-                                            onClick={(e) => handleLinkClick(e, "/#contact")}
-                                            className="flex w-full items-center justify-center gap-4 rounded-full bg-gradient-to-r from-[#FF6B35] via-[#FF1493] to-[#9B59B6] py-5 text-xl font-bold uppercase tracking-widest text-white shadow-[0_15px_40px_rgba(255,20,147,0.2)] transition-all duration-300 active:scale-95"
+                                            href={link.href}
+                                            onClick={(e) => handleLinkClick(e, link.href)}
+                                            className="text-2xl font-heading font-black uppercase tracking-tighter text-foreground/50 hover:text-foreground transition-colors py-2 block"
                                         >
-                                            Get Started
-                                            <ArrowRight size={20} strokeWidth={3} />
+                                            {link.name}
                                         </Link>
                                     </motion.div>
-                                </div>
+                                ))}
+                            </div>
+
+                            <div className="border-t border-border pt-6">
+                                <Link
+                                    href="/#contact"
+                                    onClick={(e) => handleLinkClick(e, "/#contact")}
+                                    className="flex w-full items-center justify-center bg-gradient-to-r from-[#FF6B35] via-[#FF1493] to-[#9B59B6] py-4 text-sm font-black uppercase tracking-widest text-white rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-[0_0_20px_rgba(255,20,147,0.3)] active:scale-95"
+                                >
+                                    Get Started
+                                </Link>
                             </div>
                         </motion.div>
                     </>

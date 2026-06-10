@@ -4,7 +4,6 @@ import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { Instagram, Youtube, Linkedin, Flame } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,25 +18,28 @@ interface AboutUsProps {
   description?: string;
   highlightPhrases?: string[];
   metrics?: AboutUsMetric[];
-  backgroundColor?: string;
+  teamImage?: string;
 }
 
 const AboutUs = ({
-  title = "Platforms We Dominate",
-  subtitle = "Tailored Blueprints to Stop the Scroll",
-  description = "Different social channels operate on different algorithms and viewer psychologies. We don't just crop video files—we build native channel blueprints to ensure your message fits the environment and gains maximum algorithmic velocity.",
+  title = "Who We Are",
+  subtitle = "A Leading PR & Influencer Marketing Agency — Founded 2021",
+  description = "AWA MEDIA is a leading PR and Influencer Marketing Agency, delivering impactful brand visibility and digital presence solutions. Founded in 2021, we have rapidly grown into a trusted partner for top-tier brands, events, and government projects across Gujarat and Pan India. With a strong network of influencers and media channels, we specialize in PR campaigns, influencer marketing, brand awareness, and content strategy.",
   highlightPhrases = [
-    "Instagram: Aesthetic Branding & Reel Hooks",
-    "TikTok: High-Retention Visual Storytelling",
-    "YouTube: Multi-Angle Editing & Dynamic Titles",
-    "LinkedIn: Thought Leadership & Value Carousels",
-    "Shorts/Reels: Auto-Paced Captions & Sound FX",
+    "Public Relations (PR Campaigns)",
+    "Influencer Marketing (Micro to Celebrity)",
+    "Event Promotions & Media Partnerships",
+    "Brand Awareness Campaigns",
+    "Content Strategy & Execution",
+    "Political & Government PR",
+    "Real Estate & Exhibition Marketing"
   ],
   metrics = [
-    { value: "35M+", label: "TikTok Views" },
-    { value: "15M+", label: "Reels Reach" },
-    { value: "8.5%", label: "Avg YouTube CTR" },
+    { value: "500+", label: "Campaigns" },
+    { value: "100+", label: "Brands" },
+    { value: "5+", label: "Years" }
   ],
+  teamImage = "/aboutUs.png",
 }: AboutUsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -45,7 +47,7 @@ const AboutUs = ({
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
   const typingTextRef = useRef<HTMLSpanElement>(null);
-  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   const metricRefs = useRef<(HTMLDivElement | null)[]>([]);
   const metricValueRefs = useRef<(HTMLHeadingElement | null)[]>([]);
@@ -53,6 +55,7 @@ const AboutUs = ({
 
   const [isMobile, setIsMobile] = useState(false);
 
+  // Detect Mobile Viewport
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile();
@@ -60,6 +63,7 @@ const AboutUs = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Text Typing Animation loop
   useEffect(() => {
     if (!typingTextRef.current) return;
 
@@ -103,21 +107,30 @@ const AboutUs = ({
     return () => clearTimeout(timeoutId);
   }, [highlightPhrases]);
 
-  // MOBILE: repeat animations on scroll (enter = animate in, leave = animate out)
+  // MOBILE: Trigger elements based on IntersectionObserver scroll entry/exit
   useEffect(() => {
     if (!isMobile) return;
 
-    const cardsEl = cardsContainerRef.current;
+    const imageEl = imageRef.current;
     const titleEl = titleRef.current;
     const subtitleEl = subtitleRef.current;
     const descEl = descriptionRef.current;
     const highlightEl = highlightRef.current;
 
-    if (!cardsEl || !titleEl || !descEl || !highlightEl) return;
+    if (!imageEl || !titleEl || !descEl || !highlightEl) return;
 
-    // Initial hidden state (mobile only)
-    gsap.set(cardsEl.children, { opacity: 0, y: 35, scale: 0.95 });
-    gsap.set([titleEl, subtitleEl, descEl, highlightEl], { opacity: 0, y: 28 });
+    // Initial mobile-specific setup
+    gsap.set([imageEl], { opacity: 0, y: 35, scale: 0.95 });
+    gsap.set([descEl, highlightEl], { opacity: 0, y: 25 });
+    if (subtitleEl) gsap.set(subtitleEl, { opacity: 0, y: 20 });
+    
+    const titleWords = titleEl.querySelectorAll(".word-inner");
+    if (titleWords.length > 0) {
+      gsap.set(titleWords, { y: "100%" });
+    } else {
+      gsap.set(titleEl, { opacity: 0, y: 25 });
+    }
+
     gsap.set(metricRefs.current, { opacity: 0, y: 25, scale: 0.95 });
     gsap.set(metricLabelRefs.current, { opacity: 0 });
 
@@ -134,9 +147,9 @@ const AboutUs = ({
       if (!el) return;
 
       const fullValue = metrics[index]?.value || "";
-      const numericMatch = fullValue.match(/[\d,.]+/);
-      const numericValue = numericMatch ? parseFloat(numericMatch[0]) : 0;
-      const unit = fullValue.replace(/[\d,.]+/, "").trim();
+      const numericMatch = fullValue.match(/[\d,]+/);
+      const numericValue = numericMatch ? parseInt(numericMatch[0].replace(/,/g, "")) : 0;
+      const unit = fullValue.replace(/[\d,]+/, "").trim();
 
       if (numericValue <= 0) {
         el.textContent = fullValue;
@@ -149,59 +162,63 @@ const AboutUs = ({
         duration: 1.1,
         ease: "power2.out",
         onUpdate: () => {
-          const val = numberObj.number % 1 === 0 ? Math.floor(numberObj.number) : numberObj.number.toFixed(1);
-          el.textContent = val + (unit ? unit : "");
+          el.textContent = Math.floor(numberObj.number).toLocaleString() + (unit ? unit : "");
         },
       });
     };
 
-    const animateIn = (el: Element, type: "cards" | "text" | "metric") => {
-      if (type === "cards") {
-        gsap.to(Array.from(el.children), {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: "power3.out",
-        });
+    const animateIn = (el: Element, type: "image" | "text" | "metric") => {
+      if (type === "image") {
+        gsap.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.65, ease: "power3.out" });
       }
       if (type === "text") {
-        gsap.to(el, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" });
+        if (el === titleEl) {
+          const words = el.querySelectorAll(".word-inner");
+          if (words.length > 0) {
+            gsap.to(words, { y: "0%", duration: 0.65, stagger: 0.05, ease: "power3.out" });
+          } else {
+            gsap.to(el, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" });
+          }
+        } else {
+          gsap.to(el, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" });
+        }
       }
       if (type === "metric") {
         gsap.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" });
       }
     };
 
-    const animateOut = (el: Element, type: "cards" | "text" | "metric") => {
-      if (type === "cards") {
-        gsap.to(Array.from(el.children), {
-          opacity: 0,
-          y: 35,
-          scale: 0.95,
-          duration: 0.4,
-          ease: "power2.out",
-        });
+    const animateOut = (el: Element, type: "image" | "text" | "metric") => {
+      if (type === "image") {
+        gsap.to(el, { opacity: 0, y: 35, scale: 0.95, duration: 0.4, ease: "power2.out" });
       }
       if (type === "text") {
-        gsap.to(el, { opacity: 0, y: 28, duration: 0.35, ease: "power2.out" });
+        if (el === titleEl) {
+          const words = el.querySelectorAll(".word-inner");
+          if (words.length > 0) {
+            gsap.to(words, { y: "100%", duration: 0.4, ease: "power2.in" });
+          } else {
+            gsap.to(el, { opacity: 0, y: 25, duration: 0.35, ease: "power2.out" });
+          }
+        } else {
+          gsap.to(el, { opacity: 0, y: 25, duration: 0.35, ease: "power2.out" });
+        }
       }
       if (type === "metric") {
         gsap.to(el, { opacity: 0, y: 25, scale: 0.95, duration: 0.35, ease: "power2.out" });
       }
     };
 
-    const cardsObserver = new IntersectionObserver(
+    const imgObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) animateIn(entry.target, "cards");
-          else animateOut(entry.target, "cards");
+          if (entry.isIntersecting) animateIn(entry.target, "image");
+          else animateOut(entry.target, "image");
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.15 }
     );
-    cardsObserver.observe(cardsEl);
+    imgObserver.observe(imageEl);
 
     const blockObserver = new IntersectionObserver(
       (entries) => {
@@ -212,7 +229,6 @@ const AboutUs = ({
       },
       { threshold: 0.25 }
     );
-
     blockObserver.observe(titleEl);
     if (subtitleEl) blockObserver.observe(subtitleEl);
     blockObserver.observe(descEl);
@@ -222,7 +238,6 @@ const AboutUs = ({
       (entries) => {
         entries.forEach((entry) => {
           const idx = metricRefs.current.findIndex((m) => m === entry.target);
-
           if (entry.isIntersecting) {
             animateIn(entry.target, "metric");
             if (idx !== -1) {
@@ -249,13 +264,13 @@ const AboutUs = ({
     });
 
     return () => {
-      cardsObserver.disconnect();
+      imgObserver.disconnect();
       blockObserver.disconnect();
       metricObserver.disconnect();
     };
   }, [isMobile, metrics]);
 
-  // Desktop GSAP
+  // Desktop GSAP scroll trigger timeline configuration
   useGSAP(
     () => {
       ScrollTrigger.getAll().forEach((trigger) => {
@@ -267,10 +282,17 @@ const AboutUs = ({
 
       if (isMobile) return;
 
-      gsap.set([titleRef.current, subtitleRef.current], { opacity: 0, x: -50 });
-      gsap.set([descriptionRef.current, highlightRef.current], { opacity: 0, x: -30 });
-      gsap.set(cardsContainerRef.current?.children || [], { opacity: 0, x: 50, scale: 0.95 });
-      gsap.set(metricRefs.current, { opacity: 0, y: 40, scale: 0.9 });
+      const titleWords = titleRef.current?.querySelectorAll(".word-inner");
+      if (titleWords && titleWords.length > 0) {
+        gsap.set(titleWords, { y: "100%" });
+      } else {
+        gsap.set(titleRef.current, { opacity: 0, y: 30 });
+      }
+
+      gsap.set(subtitleRef.current, { opacity: 0, y: 20 });
+      gsap.set([descriptionRef.current, highlightRef.current], { opacity: 0, y: 30 });
+      gsap.set(imageRef.current, { opacity: 0, scale: 0.95, y: 30 });
+      gsap.set(metricRefs.current, { opacity: 0, y: 30, scale: 0.92 });
       gsap.set(metricLabelRefs.current, { opacity: 0 });
 
       const tl = gsap.timeline({
@@ -282,35 +304,29 @@ const AboutUs = ({
         },
       });
 
-      tl.to(titleRef.current, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0);
-      if (subtitleRef.current) {
-        tl.to(subtitleRef.current, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 0.1);
+      if (titleWords && titleWords.length > 0) {
+        tl.to(titleWords, { y: "0%", duration: 0.8, stagger: 0.08, ease: "power4.out" }, 0);
+      } else {
+        tl.to(titleRef.current, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0);
       }
 
-      tl.to(descriptionRef.current, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out" }, 0.3)
-        .to(highlightRef.current, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out" }, 0.5);
+      if (subtitleRef.current) {
+        tl.to(subtitleRef.current, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.15);
+      }
 
-      tl.to(
-        Array.from(cardsContainerRef.current?.children || []),
-        {
-          opacity: 1,
-          x: 0,
-          scale: 1,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: "back.out(1.2)",
-        },
-        0.2
-      );
+      tl.to(descriptionRef.current, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 0.3)
+        .to(highlightRef.current, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 0.45);
+
+      tl.to(imageRef.current, { opacity: 1, scale: 1, y: 0, duration: 1, ease: "power3.out" }, 0.25);
 
       metricRefs.current.forEach((metricRef, index) => {
         if (metricRef && metricValueRefs.current[index]) {
           const fullValue = metrics[index]?.value || "";
-          const numericMatch = fullValue.match(/[\d,.]+/);
-          const numericValue = numericMatch ? parseFloat(numericMatch[0]) : 0;
-          const unit = fullValue.replace(/[\d,.]+/, "").trim();
+          const numericMatch = fullValue.match(/[\d,]+/);
+          const numericValue = numericMatch ? parseInt(numericMatch[0].replace(/,/g, "")) : 0;
+          const unit = fullValue.replace(/[\d,]+/, "").trim();
 
-          const startTime = 0.8 + index * 0.15;
+          const startTime = 0.6 + index * 0.12;
 
           tl.to(
             metricRef,
@@ -319,7 +335,7 @@ const AboutUs = ({
               y: 0,
               scale: 1,
               duration: 0.6,
-              ease: "back.out(1.7)",
+              ease: "back.out(1.5)",
             },
             startTime
           );
@@ -330,12 +346,12 @@ const AboutUs = ({
               numberObj,
               {
                 number: numericValue,
-                duration: 1.5,
+                duration: 1.2,
                 ease: "power2.out",
                 onUpdate: () => {
                   if (metricValueRefs.current[index]) {
-                    const val = numberObj.number % 1 === 0 ? Math.floor(numberObj.number).toLocaleString() : numberObj.number.toFixed(1);
-                    metricValueRefs.current[index]!.textContent = val + (unit ? unit : "");
+                    const formatted = Math.floor(numberObj.number).toLocaleString();
+                    metricValueRefs.current[index]!.textContent = formatted + (unit ? unit : "");
                   }
                 },
               },
@@ -346,8 +362,8 @@ const AboutUs = ({
           if (metricLabelRefs.current[index]) {
             tl.to(
               metricLabelRefs.current[index],
-              { opacity: 1, duration: 0.5, ease: "power2.out" },
-              startTime + 0.3
+              { opacity: 1, duration: 0.4, ease: "power2.out" },
+              startTime + 0.2
             );
           }
         }
@@ -355,7 +371,7 @@ const AboutUs = ({
     },
     {
       scope: containerRef,
-      dependencies: [metrics, subtitle, isMobile],
+      dependencies: [metrics, subtitle, teamImage, isMobile],
       revertOnUpdate: true,
     }
   );
@@ -363,7 +379,7 @@ const AboutUs = ({
   return (
     <div
       id="about"
-      className="relative overflow-hidden py-16 sm:py-20 lg:py-24 bg-card transition-colors duration-500 border-t border-black/5 dark:border-white/5"
+      className="relative overflow-hidden py-10 sm:py-14 lg:py-16 bg-card transition-colors duration-500 border-t border-black/5 dark:border-white/5"
       ref={containerRef}
     >
       <style jsx>{`
@@ -377,30 +393,40 @@ const AboutUs = ({
       `}</style>
 
       <div className="container mx-auto relative z-10 px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Text Column */}
-          <div className="lg:col-span-6 flex flex-col gap-6">
+          <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <h2
                 ref={titleRef}
                 className="text-foreground text-3xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight uppercase"
               >
-                {title}
+                {title.split(" ").map((word, idx) => (
+                  <span
+                    key={idx}
+                    className="word-mask mr-[0.25em]"
+                    style={{ display: "inline-block", overflow: "hidden", verticalAlign: "bottom" }}
+                  >
+                    <span className="word-inner inline-block">{word}</span>
+                  </span>
+                ))}
               </h2>
 
-              <h3
-                ref={subtitleRef}
-                className="text-lg sm:text-xl font-bold leading-relaxed"
-                style={{
-                  background: "linear-gradient(135deg, #FF6B35 0%, #FF1493 50%, #9D00FF 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                {subtitle}
-              </h3>
+              {subtitle && (
+                <h3
+                  ref={subtitleRef}
+                  className="text-lg sm:text-xl font-bold leading-relaxed"
+                  style={{
+                    background: "linear-gradient(135deg, #FF6B35 0%, #FF1493 50%, #9B59B6 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  {subtitle}
+                </h3>
+              )}
             </div>
 
             <p
@@ -446,54 +472,27 @@ const AboutUs = ({
             </div>
           </div>
 
-          {/* Right Platforms Grid Column */}
-          <div className="lg:col-span-6">
-            <div ref={cardsContainerRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
-              {/* Instagram Card */}
-              <div className="p-6 rounded-3xl bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 hover:border-[#FF1493] transition-all duration-500 hover:-translate-y-1 hover:shadow-lg group">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#FF6B35] to-[#FF1493] flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Instagram size={20} />
-                </div>
-                <h4 className="text-base font-black text-foreground mb-1.5 uppercase">Instagram Blueprints</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
-                  Aesthetic visual framing, high-retention reel structure, audio hook curation, and carousels designed to convert views into website visits.
+          {/* Right Image Column */}
+          <div className="lg:col-span-5 flex justify-center w-full">
+            <div
+              ref={imageRef}
+              className="relative w-full aspect-[4/3] lg:aspect-[4/5] xl:aspect-[1.1] rounded-3xl overflow-hidden shadow-2xl border border-black/10 dark:border-white/10 group"
+            >
+              <Image
+                src={teamImage}
+                alt="AWA Media team brainstorming and working on projects"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex flex-col justify-end">
+                <p className="text-white/95 text-sm sm:text-base font-bold drop-shadow-md">
+                  129, Sameer Complex, CG Rd, Ahmedabad
+                </p>
+                <p className="text-white/70 text-xs mt-1 font-semibold">
+                  Delivering impactful PR & Influencer campaigns since 2021.
                 </p>
               </div>
-
-              {/* TikTok Card */}
-              <div className="p-6 rounded-3xl bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 hover:border-[#9D00FF] transition-all duration-500 hover:-translate-y-1 hover:shadow-lg group">
-                <div className="w-10 h-10 rounded-2xl bg-black flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Flame size={20} className="text-[#00f2fe]" />
-                </div>
-                <h4 className="text-base font-black text-foreground mb-1.5 uppercase">TikTok Velocity</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
-                  Extreme hook testing, fast-paced editing cuts, automated text styling, trend newsjacking, and leveraging platform-specific viral formats.
-                </p>
-              </div>
-
-              {/* YouTube Shorts / Video Card */}
-              <div className="p-6 rounded-3xl bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 hover:border-red-650 transition-all duration-500 hover:-translate-y-1 hover:shadow-lg group">
-                <div className="w-10 h-10 rounded-2xl bg-red-600 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Youtube size={20} />
-                </div>
-                <h4 className="text-base font-black text-foreground mb-1.5 uppercase">YouTube Optimization</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
-                  Clickable high-contrast thumbnail engineering, deep retention pacing analysis, title optimization, and community integration.
-                </p>
-              </div>
-
-              {/* LinkedIn Card */}
-              <div className="p-6 rounded-3xl bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 hover:border-blue-650 transition-all duration-500 hover:-translate-y-1 hover:shadow-lg group">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Linkedin size={20} />
-                </div>
-                <h4 className="text-base font-black text-foreground mb-1.5 uppercase">LinkedIn Authority</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
-                  Thought leadership scripting, high-value visual document carousels, text copywriting hooks, and direct lead generation templates.
-                </p>
-              </div>
-
             </div>
           </div>
 

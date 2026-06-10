@@ -1,74 +1,102 @@
-import { Video, Youtube, Share2, Palette, TrendingUp } from "lucide-react";
+import { Megaphone, Users, Calendar, Eye, FileText, Building, TrendingUp } from "lucide-react";
 
 export const services = [
     {
-        slug: "short-form-production",
-        icon: Video,
-        title: "Short-Form Production",
-        description: "High-impact 9:16 videos for TikTok, Reels, and Shorts. Engineered from hook to call-to-action for maximal viewer retention.",
-        details: "Our short-form video production service covers the entire creative cycle. We focus on engineering visual and verbal hooks in the first 3 seconds, pacing the editing using zooms/SFX/motion graphics, and formatting captions for maximum retention.",
+        slug: "public-relations",
+        icon: Megaphone,
+        title: "Public Relations (PR)",
+        description: "Strategic PR campaigns for brands, concerts, festivals, and government projects with maximum media coverage and impact.",
+        details: "Our PR campaigns are designed from the ground up for maximum visibility. We handle end-to-end media outreach — from press releases and media kits to journalist briefings and editorial placements. Whether it's a major concert, brand launch, or government project, we ensure comprehensive coverage across print, digital, and broadcast media.",
         features: [
-            "Hook Engineering & Verification",
-            "Dynamic Retention-Focused Editing",
-            "Trending Audio & SFX Curation",
-            "Caption Formatting & Visual Styling",
-            "Thumbnail/Cover Design & Copywriting"
+            "Press Release Writing & Distribution",
+            "Media Outreach & Journalist Relations",
+            "Event PR & Launch Campaigns",
+            "Crisis Communication & Reputation Management",
+            "Government & Political PR Strategy"
         ]
     },
     {
-        slug: "long-form-growth",
-        icon: Youtube,
-        title: "Long-Form Growth",
-        description: "Complete editing, content structuring, high-CTR thumbnail styling, and metadata optimization for YouTube and podcasts.",
-        details: "Long-form content is the ultimate vehicle for community building and authority. We structure YouTube videos and podcasts from intro hook to mid-roll and outro cards to optimize average viewer duration and CTR.",
+        slug: "influencer-marketing",
+        icon: Users,
+        title: "Influencer Marketing",
+        description: "Micro to celebrity-level influencer campaigns across Gujarat & Pan India, driving brand engagement at every scale.",
+        details: "We operate a vetted influencer network spanning 10,000+ creators across Gujarat and Pan India. From nano-influencers for hyper-local campaigns to celebrity partnerships with national reach, we curate, brief, and manage every activation for maximum brand impact and measurable ROI.",
         features: [
-            "Video Editing & Audio Mastering",
-            "High-CTR Thumbnail Design",
-            "Title & Description Optimization",
-            "Content Pacing & Retentive Scripting",
-            "YouTube SEO & Upload Management"
+            "Influencer Curation & Vetting",
+            "Campaign Strategy & Briefing",
+            "Content Co-Creation & Approval",
+            "Performance Tracking & Analytics",
+            "Celebrity & Macro Influencer Partnerships"
         ]
     },
     {
-        slug: "social-media-management",
-        icon: Share2,
-        title: "Platform Management",
-        description: "Hands-on scheduling, native caption writing, comment moderation, trend newsjacking, and weekly community scaling blueprints.",
-        details: "We own the daily distribution of your content. By writing native captions and descriptions, moderating comments, tracking real-time trends for newsjacking, and scheduling optimized posts, we ensure your channels stay highly active.",
+        slug: "event-promotions",
+        icon: Calendar,
+        title: "Event Promotions & Media Partnerships",
+        description: "Concert PR, Navratri events, festival marketing, media partnerships, and launch event management.",
+        details: "From Arijit Singh and AP Dhillon concerts to Navratri festivals and brand launch events, we deliver complete event PR solutions. We handle pre-event buzz creation, media partnerships, influencer invitations, live event coverage, and post-event media syndication for maximum impact.",
         features: [
-            "Multi-Platform Native Distribution",
-            "Copywriting for Captions & Threads",
-            "Active Comment & Community Moderation",
-            "Daily Trend & Newsjacking Scans",
-            "Weekly Analytics & Performance Reports"
+            "Concert & Festival PR Campaigns",
+            "Media Partnership Coordination",
+            "Influencer Event Activations",
+            "Live Event Content Coverage",
+            "Post-Event Media Syndication"
         ]
     },
     {
-        slug: "branding-design",
-        icon: Palette,
-        title: "Creator Brand & Identity",
-        description: "Visual layouts, custom color grading presets, custom thumbnail styles, brand deck configurations, and uniform media skins.",
-        details: "A premium creator brand requires visual consistency. We design uniform graphic palettes, customized color grading presets, media kits, thumbnail templates, and profile assets that form a cohesive and recognizable footprint.",
+        slug: "brand-awareness",
+        icon: Eye,
+        title: "Brand Awareness Campaigns",
+        description: "360° brand visibility campaigns with measurable reach, engagement, and impact across all channels.",
+        details: "We design and execute comprehensive brand awareness campaigns that combine PR, influencer marketing, digital promotions, and content strategy. Our approach ensures your brand reaches the right audience at the right time, driving measurable visibility and engagement across Gujarat and Pan India.",
         features: [
-            "Custom Creator Graphic Presets",
-            "Profile Skins & Banners Layout",
-            "Color Grading & Lut Configurations",
-            "Media Kits & Sponsorship Decks",
-            "Graphic Asset Template Systems"
+            "Integrated Brand Campaigns",
+            "Cross-Platform Digital Promotions",
+            "Brand Positioning & Messaging",
+            "Audience Targeting & Reach Optimization",
+            "Campaign Analytics & ROI Reporting"
         ]
     },
     {
-        slug: "strategy-auditing",
+        slug: "content-strategy",
+        icon: FileText,
+        title: "Content Strategy & Execution",
+        description: "End-to-end content planning, creation, and execution for PR campaigns and digital promotions.",
+        details: "Content is at the heart of every successful campaign. We plan, create, and distribute strategic content across all channels — from social media posts and video content to press releases and thought leadership articles. Our content strategies are data-driven and designed for maximum engagement.",
+        features: [
+            "Content Calendar Planning",
+            "Social Media Content Creation",
+            "Video & Visual Content Production",
+            "Copywriting & Editorial",
+            "Content Performance Analytics"
+        ]
+    },
+    {
+        slug: "real-estate-marketing",
+        icon: Building,
+        title: "Real Estate & Exhibition Marketing",
+        description: "PR campaigns, exhibitions, and digital promotions for leading real estate developers and groups.",
+        details: "We've worked with Gujarat's top real estate names — CREDAI, Adani Realty, Ganesh Housing, Samarth Group, and more. Our real estate marketing services include exhibition PR, project launch campaigns, influencer property tours, and comprehensive digital promotions for new developments.",
+        features: [
+            "Project Launch PR Campaigns",
+            "Exhibition & Event Marketing",
+            "Influencer Property Tours",
+            "Digital Promotion Campaigns",
+            "Real Estate Brand Positioning"
+        ]
+    },
+    {
+        slug: "political-government-pr",
         icon: TrendingUp,
-        title: "Growth Auditing & Consulting",
-        description: "Granular review of viewer drop-off analytics, demographic analytics, retention curve fixes, CTR audits, and tag recommendations.",
-        details: "Stop guessing why your content isn't scaling. We run in-depth channel audits, examining watch-time curves, CTR metrics, viewer demographic retention, and direct conversions to build clear pivot strategies.",
+        title: "Political & Government PR",
+        description: "Digital PR for government bodies, positive public image strategy for ministers and MLAs — Pan India execution.",
+        details: "We specialize in government and political PR with a focus on positive public image strategy. Our campaigns span Gujarat and Pan India, covering digital PR for government projects, minister and MLA campaigns, and public awareness initiatives. We handle sensitive communications with discretion and professionalism.",
         features: [
-            "Retention Curve & Watch-Time Audits",
-            "CTR & Thumbnail Diagnostics",
-            "Algorithm Feed Tuning Strategy",
-            "Competitor & Niche Gap Analysis",
-            "1-on-1 Strategy Consulting Sessions"
+            "Positive Public Image Strategy",
+            "Government Project Digital PR",
+            "Social Media Campaign Management",
+            "Media Relations & Press Coverage",
+            "Pan India Campaign Execution"
         ]
     },
 ];

@@ -5,6 +5,13 @@ import "./globals.css";
 import PreLoaderWrapper from "@/components/PreLoader/PreLoaderWrapper";
 import GsapConfig from "@/components/GsapConfig"; // <-- Import the new component
 import { ThemeProvider } from "@/lib/ThemeContext";
+import CustomCursor from "@/components/ui/CustomCursor";
+
+export const metadata = {
+  title: "AWA MEDIA | Leading PR & Influencer Marketing Agency",
+  description: "AWA MEDIA is Gujarat's premier PR and Influencer Marketing Agency, delivering impactful brand visibility, digital presence solutions, and campaign execution across India.",
+  keywords: ["AWA Media", "PR Agency Gujarat", "Influencer Marketing Ahmedabad", "Concert PR India", "Brand Awareness", "Government PR"],
+};
 
 export const viewport = {
   width: "device-width",
@@ -25,7 +32,7 @@ export default function RootLayout({
               (function() {
                 try {
                   const savedTheme = localStorage.getItem('theme');
-                  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  if (savedTheme === 'dark') {
                     document.documentElement.classList.add('dark');
                   } else {
                     document.documentElement.classList.remove('dark');
@@ -40,6 +47,7 @@ export default function RootLayout({
         <ThemeProvider>
           {/* Global GSAP initialization */}
           <GsapConfig />
+          <CustomCursor />
 
           <PreLoaderWrapper>
             <ViewportHeightFix />

@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
+import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 import {
   MapPin,
-  Mail,
   Phone,
   Instagram,
   Linkedin,
@@ -15,104 +14,161 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-const GRADIENT = "linear-gradient(135deg,#FF6B35,#FF1493,#9D00FF)";
-
-const ContactFooter = () => {
-  const [isMobile, setIsMobile] = useState(false);
+export default function ContactFooter() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const hasAnimatedRef = useRef(false);
+  const socialsRef = useRef<HTMLDivElement>(null);
+  const footerMetaRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const headingText = "LET'S COLLABORATE";
+  const headingWords = headingText.split(" ");
 
   useGSAP(
     () => {
-      if (isMobile) return;
-      if (hasAnimatedRef.current) return;
-
-      const title = titleRef.current;
-      const items = contentRef.current?.children;
-
-      if (!title || !items) return;
-
-      gsap.set([title, items], { opacity: 0, y: 20 });
-
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 80%",
-          once: true,
-          onEnter: () => (hasAnimatedRef.current = true),
-        },
-      })
-        .to(title, { opacity: 1, y: 0, duration: 0.4 })
-        .to(items, { opacity: 1, y: 0, stagger: 0.08, duration: 0.35 }, "-=0.2");
-    },
-    { scope: containerRef, dependencies: [isMobile] }
-  );
-
-  // Mobile Animation
-  useEffect(() => {
-    if (!isMobile) return;
-    if (hasAnimatedRef.current) return;
-
-    const title = titleRef.current;
-    const items = contentRef.current ? Array.from(contentRef.current.children) : [];
-
-    if (!title && !items.length) return;
-
-    if (title) gsap.set(title, { opacity: 0, y: 20 });
-    if (items.length) gsap.set(items, { opacity: 0, y: 20 });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            gsap.to(entry.target, {
-              opacity: 1,
-              y: 0,
-              duration: 0.5,
-              ease: "power2.out",
-              overwrite: true
-            });
-            observer.unobserve(entry.target);
-            hasAnimatedRef.current = true;
+      // Animate the badge
+      const badge = titleRef.current?.querySelector(".engage-badge");
+      if (badge) {
+        gsap.fromTo(
+          badge,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 80%",
+              once: true,
+            },
           }
+        );
+      }
+
+      // Word-split reveal animation for the heading
+      const wordInners = titleRef.current?.querySelectorAll(".word-inner");
+      if (wordInners && wordInners.length) {
+        gsap.set(wordInners, { yPercent: 100 });
+        gsap.to(wordInners, {
+          yPercent: 0,
+          duration: 0.7,
+          stagger: 0.08,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 80%",
+            once: true,
+          },
         });
-      },
-      { threshold: 0.1 }
-    );
+      }
 
-    if (title) observer.observe(title);
-    items.forEach(item => observer.observe(item));
+      // Animate description paragraph
+      const paragraph = titleRef.current?.querySelector(".engage-desc");
+      if (paragraph) {
+        gsap.fromTo(
+          paragraph,
+          { opacity: 0, y: 15 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: 0.4,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
+      }
 
-    return () => observer.disconnect();
-  }, [isMobile]);
+      // Contact cards: stagger from bottom with scale
+      const cards = contentRef.current ? Array.from(contentRef.current.children) : [];
+      if (cards.length) {
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 35, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            stagger: 0.12,
+            ease: "back.out(1.2)",
+            scrollTrigger: {
+              trigger: contentRef.current,
+              start: "top 85%",
+              once: true,
+            },
+          }
+        );
+      }
+
+      // Social icons: bounce-in with scale
+      const socialIcons = socialsRef.current ? Array.from(socialsRef.current.children) : [];
+      if (socialIcons.length) {
+        gsap.fromTo(
+          socialIcons,
+          { opacity: 0, scale: 0 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: "back.out(1.7)",
+            scrollTrigger: {
+              trigger: footerMetaRef.current,
+              start: "top 90%",
+              once: true,
+            },
+          }
+        );
+      }
+
+      // Footer text/credits: fade in after main content
+      const creditsBlock = footerMetaRef.current?.querySelector(".credits-block");
+      if (creditsBlock) {
+        gsap.fromTo(
+          creditsBlock,
+          { opacity: 0, y: 15 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: 0.2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: footerMetaRef.current,
+              start: "top 90%",
+              once: true,
+            },
+          }
+        );
+      }
+    },
+    { scope: containerRef }
+  );
 
   const contactInfo = [
     {
-      icon: <MapPin className="w-4 h-4 text-white" />,
-      title: "Address",
-      content: "CG Road, Navrangpura, Ahmedabad",
-      link: "https://maps.google.com/?q=CG+Road+Ahmedabad",
+      icon: <MapPin size={16} />,
+      title: "HQ Address",
+      content: "129, Sameer Complex, CG Rd, Ahmedabad",
+      link: "https://maps.google.com/?q=129+Sameer+Complex+CG+Road+Ahmedabad",
     },
     {
-      icon: <Mail className="w-4 h-4 text-white" />,
-      title: "Email",
-      content: "awamedia.co@gmail.com",
-      link: "mailto:awamedia.co@gmail.com",
-    },
-    {
-      icon: <Phone className="w-4 h-4 text-white" />,
+      icon: <Phone size={16} />,
       title: "Phone",
-      content: "+91 85113 62120",
-      link: "tel:+918511362120",
+      content: "+91 97141 53334",
+      link: "tel:+919714153334",
+    },
+    {
+      icon: <Phone size={16} />,
+      title: "Phone 2",
+      content: "+91 97146 07159",
+      link: "tel:+919714607159",
     },
   ];
 
@@ -120,38 +176,44 @@ const ContactFooter = () => {
     <footer
       id="contact"
       ref={containerRef}
-      className="relative w-full py-12 lg:py-16 px-4 lg:px-8 bg-card transition-colors duration-500 overflow-hidden border-t border-black/5 dark:border-white/10"
+      className="relative w-full py-24 lg:py-32 bg-card overflow-hidden border-t border-border/60"
     >
-      {/* Decorative Orbs */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none hidden lg:block">
-        <div className="absolute -top-32 -left-32 w-72 h-72 bg-orange-500 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 w-72 h-72 bg-purple-500 rounded-full blur-3xl" />
-      </div>
+      {/* Background glow decoration */}
+      <div className="absolute top-[20%] left-[-10%] w-[350px] h-[350px] rounded-full bg-primary/4 blur-[100px] pointer-events-none" />
 
-      <div className="relative max-w-6xl mx-auto">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        
         {/* Header */}
-        <div className="text-center mb-10">
-          <h2
-            ref={titleRef}
-            className="text-3xl lg:text-4xl font-black mb-3 uppercase tracking-tight"
-            style={{
-              background: GRADIENT,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Start Your Growth Audit
+        <div ref={titleRef} className="text-left mb-16 max-w-xl">
+          <div className="engage-badge inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/10 bg-primary/5 text-primary text-[10px] font-extrabold uppercase tracking-wider mb-3">
+            <span>ENGAGE PROJECT</span>
+          </div>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black text-foreground uppercase leading-none tracking-tight mb-4">
+            {headingWords.map((word, i) => (
+              <span
+                key={i}
+                className="word-mask"
+                style={{ display: "inline-block", overflow: "hidden", verticalAlign: "bottom" }}
+              >
+                <span
+                  className="word-inner"
+                  style={{ display: "inline-block" }}
+                >
+                  {word}
+                </span>
+                {i < headingWords.length - 1 && "\u00A0"}
+              </span>
+            ))}
           </h2>
-          <p className="text-muted-foreground text-sm lg:text-base font-semibold">
-            Ready to engineering virality? Get in touch with us.
+          <p className="engage-desc text-sm text-muted-foreground leading-relaxed font-semibold">
+            Ready to elevate your brand&apos;s visibility? Connect with AWA MEDIA for impactful PR & influencer campaigns.
           </p>
         </div>
 
-        {/* Contact cards */}
+        {/* Spacious Contact Cards Grid */}
         <div
           ref={contentRef}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8"
         >
           {contactInfo.map((item, i) => (
             <a
@@ -159,57 +221,62 @@ const ContactFooter = () => {
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-start gap-4 p-5 rounded-3xl border border-black/5 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all duration-300 shadow-sm"
+              className="p-8 rounded-3xl border border-border bg-background flex items-center justify-between gap-4 hover:border-primary/20 hover:shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:hover:shadow-[0_15px_40px_rgba(0,0,0,0.15)] transition-all duration-300 group cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#FF6B35] to-[#FF1493] shrink-0 group-hover:scale-105 transition-transform">
-                {item.icon}
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="w-10 h-10 rounded-xl border border-border bg-card text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 shadow-sm shrink-0">
+                  {item.icon}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="font-mono text-[9px] font-extrabold text-primary uppercase tracking-wider block mb-1">
+                    {item.title}
+                  </span>
+                  <span className="text-xs text-foreground font-semibold truncate leading-none">
+                    {item.content}
+                  </span>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-black text-foreground uppercase tracking-wide mb-0.5">
-                  {item.title}
-                </h3>
-                <p className="text-xs text-muted-foreground leading-snug font-semibold truncate">
-                  {item.content}
-                </p>
-              </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all self-center shrink-0" />
+              <ArrowRight className="w-4 h-4 text-foreground opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
             </a>
           ))}
         </div>
 
-        {/* Bottom */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-black/5 dark:border-white/10">
-          <div className="flex gap-3">
+        {/* Footer Bottom Meta */}
+        <div ref={footerMetaRef} className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-12 mt-16 border-t border-border/60">
+          {/* Social Links */}
+          <div ref={socialsRef} className="flex gap-2">
             <a
               href="https://instagram.com/awamedia.co"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 flex items-center justify-center hover:bg-white/60 dark:hover:bg-white/15 text-foreground hover:scale-105 transition-all shadow-sm"
+              className="w-9 h-9 rounded-full border border-border bg-background flex items-center justify-center text-foreground hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm"
               aria-label="Instagram"
             >
-              <Instagram className="w-4 h-4" />
+              <Instagram size={14} />
             </a>
             <a
               href="https://linkedin.com/company/awamedia"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 flex items-center justify-center hover:bg-white/60 dark:hover:bg-white/15 text-foreground hover:scale-105 transition-all shadow-sm"
+              className="w-9 h-9 rounded-full border border-border bg-background flex items-center justify-center text-foreground hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm"
               aria-label="LinkedIn"
             >
-              <Linkedin className="w-4 h-4" />
+              <Linkedin size={14} />
             </a>
           </div>
 
-          <div className="text-center sm:text-right">
-            <p className="text-sm font-black text-foreground uppercase tracking-wider">AWA MEDIA</p>
-            <p className="text-xs text-muted-foreground font-semibold">
-              © {new Date().getFullYear()} All rights reserved.
+          {/* Credits */}
+          <div className="credits-block text-center sm:text-right">
+            <p className="font-heading text-xs font-black uppercase text-foreground leading-none mb-1">
+              AWA MEDIA // ATTENTION_LABS
             </p>
+            <span className="font-mono text-[9px] text-muted-foreground uppercase">
+              © {new Date().getFullYear()} All rights reserved.
+            </span>
           </div>
         </div>
+
       </div>
     </footer>
   );
-};
-
-export default ContactFooter;
+}

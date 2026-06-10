@@ -81,6 +81,7 @@ export default function ServiceDetailPage() {
                             transition={{ delay: 0.2 }}
                             className="lg:col-span-5 relative aspect-video sm:aspect-square lg:aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-xl border border-black/5 dark:border-white/10 bg-neutral-900"
                         >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop"
                                 alt={service.title}
@@ -136,10 +137,10 @@ export default function ServiceDetailPage() {
                     >
                         <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
                             <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground leading-tight mb-4 tracking-tight">
-                                Ready to scale your brand?
+                                Ready to elevate your brand?
                             </h2>
                             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-8 font-medium">
-                                Let&apos;s discuss how our {service.title} strategy can help your channel reach new viral heights.
+                                Let&apos;s discuss how our {service.title} campaigns can drive impactful visibility for your brand.
                             </p>
                             <button
                                 onClick={() => router.push("/#contact")}

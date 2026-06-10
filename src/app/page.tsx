@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import WhyChooseAWA from "@/components/WhyChooseUs/whyChooseUs";
 import ServicesOverview from "@/components/services/overView";
 import Portfolio from "@/components/Portfolio/portfolio";
+import Timeline from "@/components/Timeline/timeline";
 import ContactFooter from "@/components/Contact/contact";
 import HowWeWork from "@/components/Our_Process/ourProcess";
 import Testimonials from "@/components/Testimonials/testimonials";
@@ -47,9 +48,11 @@ export default function HomePage() {
       <WhyChooseAWA />
       <ServicesOverview />
       <Portfolio />
+      <Timeline />
       <HowWeWork />
       <Testimonials />
       <ContactFooter />
     </MainLayout>
   );
 }
+

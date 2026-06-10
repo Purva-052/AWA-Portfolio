@@ -13,24 +13,26 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark"); // Default to dark since original site is dark
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<Theme>("light"); // Default to light warm sand theme
 
   useEffect(() => {
     // Read theme from localStorage or document class
     const savedTheme = localStorage.getItem("theme") as Theme | null;
-    const documentHasDark = document.documentElement.classList.contains("dark");
     
     if (savedTheme) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setThemeState(savedTheme);
-    } else if (documentHasDark) {
-      setThemeState("dark");
+      if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
     } else {
-      // Default fallback or media query
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setThemeState(prefersDark ? "dark" : "light");
+      // Default fallback is light
+      setThemeState("light");
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
-    setMounted(true);
   }, []);
 
   const setTheme = (newTheme: Theme) => {

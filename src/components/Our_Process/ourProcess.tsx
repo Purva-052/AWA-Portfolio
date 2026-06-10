@@ -1,215 +1,225 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
+import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 import { Search, PenTool, Layers, Globe, BarChart3, ArrowRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const GRADIENT = "linear-gradient(135deg,#FF6B35,#FF1493,#9D00FF)";
+interface ProcessStep {
+  title: string;
+  desc: string;
+  icon: React.ElementType;
+  metric: string;
+}
 
-const gradientText = {
-  background: GRADIENT,
-  WebkitBackgroundClip: "text" as const,
-  WebkitTextFillColor: "transparent",
-};
-
-const steps = [
-  { title: "Brand Audit", desc: "Analysis of niche & competition", Icon: Search },
-  { title: "Script & Hook Design", desc: "Visual storytelling hooks", Icon: PenTool },
-  { title: "Dynamic Editing", desc: "Retention pacing & sound fx", Icon: Layers },
-  { title: "Omnichannel Post", desc: "Native platform syndication", Icon: Globe },
-  { title: "Analytics Pivot", desc: "Demographic drop-off review", Icon: BarChart3 },
+const steps: ProcessStep[] = [
+  { title: "Brief & Research", desc: "Analyzing brand positioning, target demographics, and campaign objectives.", icon: Search, metric: "GOAL_ALIGN" },
+  { title: "Strategy & Curation", desc: "Selecting relevant media channels and vetting the perfect creators for outreach.", icon: PenTool, metric: "STRAT_PLAN" },
+  { title: "PR & Media Execution", desc: "Drafting campaign materials, securing media slots, and coordinating influencers.", icon: Layers, metric: "MEDIA_EXEC" },
+  { title: "Campaign Launch", desc: "Distributing press releases, launching creator content, and event coverage.", icon: Globe, metric: "PR_LAUNCH" },
+  { title: "ROI & Impact Audit", desc: "Analyzing brand reach, engagement metrics, and media pickup reports.", icon: BarChart3, metric: "ROI_REPORT" },
 ];
 
-const HowWeWork = () => {
+export default function HowWeWork() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
-  const desktopStepsRef = useRef<HTMLDivElement>(null);
-  const mobileStepsRef = useRef<HTMLDivElement>(null);
+  const stepsRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const headingWordsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  // Heading word-split text
+  const headingText = "OUR CAMPAIGN PROCESS";
+  const headingWords = headingText.split(" ");
 
-  // Mobile Animation
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const title = titleRef.current;
-    const items = mobileStepsRef.current ? Array.from(mobileStepsRef.current.children) : [];
-    const banner = bannerRef.current;
-
-    if (title) gsap.set(title, { opacity: 0, y: 30 });
-    if (items.length) gsap.set(items, { opacity: 0, y: 30 });
-    if (banner) gsap.set(banner, { opacity: 0, y: 30 });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            gsap.to(entry.target, {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: "power2.out",
-              overwrite: true
-            });
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (title) observer.observe(title);
-    items.forEach(item => observer.observe(item));
-    if (banner) observer.observe(banner);
-
-    return () => observer.disconnect();
-  }, [isMobile]);
-
-  // Desktop GSAP
   useGSAP(
     () => {
-      if (isMobile) return;
+      // Heading: word-split reveal animation
+      const wordInners = headingWordsRef.current.filter(Boolean);
+      if (wordInners.length) {
+        gsap.fromTo(
+          wordInners,
+          { y: "100%" },
+          {
+            y: "0%",
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power4.out",
+            scrollTrigger: {
+              trigger: titleRef.current,
+              start: "top 85%",
+              once: true,
+            },
+          }
+        );
+      }
 
-      const title = titleRef.current;
-      const desktopStepItems = desktopStepsRef.current ? Array.from(desktopStepsRef.current.children) : [];
-      const mobileStepItems = mobileStepsRef.current ? Array.from(mobileStepsRef.current.children) : [];
-      const stepItems = [...desktopStepItems, ...mobileStepItems];
-      const banner = bannerRef.current;
+      // Step cards: sequential scale + y animation
+      const items = stepsRef.current ? Array.from(stepsRef.current.children) : [];
+      if (items.length) {
+        gsap.fromTo(
+          items,
+          { opacity: 0, y: 40, scale: 0.9 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "back.out(1.2)",
+            scrollTrigger: {
+              trigger: stepsRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
+      }
 
-      const allTargets = [title, ...stepItems, banner].filter(Boolean);
-      gsap.set(allTargets, { opacity: 0, y: 24 });
+      // Step icons: elastic bounce animation (delayed after cards)
+      const icons = iconRefs.current.filter(Boolean);
+      if (icons.length) {
+        gsap.fromTo(
+          icons,
+          { scale: 0 },
+          {
+            scale: 1,
+            duration: 1,
+            stagger: 0.15,
+            ease: "elastic.out(1, 0.5)",
+            delay: 0.3,
+            scrollTrigger: {
+              trigger: stepsRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
+      }
 
-      gsap.timeline({
-        scrollTrigger: { trigger: sectionRef.current, start: "top 85%", once: true },
-      })
-        .to(title, { opacity: 1, y: 0, duration: 0.4 })
-        .to(stepItems, { opacity: 1, y: 0, stagger: 0.1, duration: 0.35 }, "-=0.15");
-
-      gsap.to(banner, {
-        opacity: 1, y: 0, duration: 0.55, ease: "power2.out",
-        scrollTrigger: { trigger: bannerRef.current, start: "top 88%", once: true },
-      });
+      // Bottom CTA banner: separate ScrollTrigger fade-up
+      gsap.fromTo(
+        bannerRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: bannerRef.current,
+            start: "top 85%",
+            once: true,
+          },
+        }
+      );
     },
-    { scope: sectionRef, dependencies: [isMobile] }
+    { scope: sectionRef }
   );
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full overflow-hidden px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 bg-card transition-colors duration-500 border-t border-black/5 dark:border-white/5"
+      className="relative w-full overflow-hidden py-24 lg:py-32 bg-card"
     >
-      <div className="max-w-6xl mx-auto">
+      {/* Background glow decoration */}
+      <div className="absolute top-[20%] right-[-10%] w-[350px] h-[350px] rounded-full bg-secondary/3 blur-[100px] pointer-events-none" />
 
-        {/* Stepper Header */}
-        <div ref={titleRef} className="text-center mb-12">
-          <span
-            className="inline-block px-4 py-1.5 text-xs font-bold uppercase rounded-full text-white mb-3"
-            style={{ background: GRADIENT }}
-          >
-            How We Scale
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-2 tracking-tight">
-            Our <span style={gradientText}>Process</span>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        
+        {/* Header */}
+        <div ref={titleRef} className="text-left mb-16 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/10 bg-primary/5 text-primary text-[10px] font-extrabold uppercase tracking-wider mb-3">
+            <span>HOW WE WORK</span>
+          </div>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black text-foreground uppercase leading-none tracking-tight mb-4">
+            {headingWords.map((word, i) => (
+              <span key={i} className="word-mask mr-[0.3em] last:mr-0">
+                <span
+                  className="word-inner"
+                  ref={(el) => { headingWordsRef.current[i] = el; }}
+                >
+                  {word}
+                </span>
+              </span>
+            ))}
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto font-medium">
-            A structured content development pipeline built for viral velocity.
+          <p className="text-sm text-muted-foreground leading-relaxed font-semibold">
+            How we design, execute, and scale PR and influencer marketing campaigns for maximum brand impact.
           </p>
         </div>
 
-        {/* Desktop Stepper */}
-        <div ref={desktopStepsRef} className="hidden lg:block relative pb-16">
-          <div className="absolute top-[21px] left-0 right-0 h-0.5 bg-black/5 dark:bg-white/10" />
-          <div className="absolute top-[21px] left-0 right-0 h-0.5" style={{ background: GRADIENT, opacity: 0.3 }} />
-          <div className="grid grid-cols-5 gap-6 relative z-10">
-            {steps.map((step, i) => {
-              const Icon = step.Icon;
-              return (
-                <div key={i} className="text-center group">
-                  <div className="w-11 h-11 mx-auto mb-3 flex items-center justify-center rounded-full bg-white/60 dark:bg-white/5 border border-black/5 dark:border-white/15 text-foreground backdrop-blur shadow-md transition-all duration-300 group-hover:scale-110 group-hover:border-black/10 dark:group-hover:border-white/20">
-                    <span className="text-[#FF1493] group-hover:scale-110 transition-transform duration-300">
-                      <Icon size={18} />
-                    </span>
-                  </div>
-                  <h3 className="text-xs font-black uppercase mb-1 text-foreground tracking-wide leading-tight">{step.title}</h3>
-                  <p className="text-xs text-muted-foreground font-semibold leading-relaxed">{step.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Mobile Stepper */}
-        <div ref={mobileStepsRef} className="lg:hidden space-y-6 pb-12">
-          {steps.map((step, i) => {
-            const Icon = step.Icon;
+        {/* Assembly Line Step Nodes Grid (Spacious Grid) */}
+        <div
+          ref={stepsRef}
+          className="flex md:grid md:grid-cols-5 gap-6 sm:gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scrollbar-none pb-4 -mx-4 px-4 md:mx-0 md:px-0"
+        >
+          {steps.map((step, idx) => {
+            const Icon = step.icon;
             return (
-              <div key={i} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-full bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/15 shadow-md flex items-center justify-center">
-                    <span className="text-[#FF1493]">
-                      <Icon size={18} />
+              <div
+                key={idx}
+                className="p-8 rounded-3xl border border-border/60 bg-background flex flex-col justify-between min-h-[240px] hover:border-primary/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-300 group cursor-pointer snap-center shrink-0 w-[80vw] md:w-auto"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] font-extrabold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase w-fit">
+                      STEP_0{idx + 1}
+                    </span>
+                    <span className="font-mono text-[9px] text-muted-foreground uppercase opacity-55">
+                      {"// "}{step.metric}
                     </span>
                   </div>
-                  {i < steps.length - 1 && (
-                    <div className="w-0.5 h-12 bg-black/5 dark:bg-white/10" style={{ background: GRADIENT, opacity: 0.3 }} />
-                  )}
+
+                  <div className="h-[1px] bg-border/50 w-full" />
+
+                  <div className="flex flex-col gap-2">
+                    <h3 className="font-heading text-xs font-black uppercase text-foreground leading-none">
+                      {step.title}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed font-semibold">
+                      {step.desc}
+                    </p>
+                  </div>
                 </div>
-                <div className="pt-1.5">
-                  <h3 className="text-sm font-black uppercase mb-1 text-foreground leading-none">{step.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-tight font-semibold">{step.desc}</p>
+
+                <div
+                  className="w-10 h-10 rounded-xl border border-border bg-card text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 shadow-sm mt-6"
+                  ref={(el) => { iconRefs.current[idx] = el; }}
+                >
+                  <Icon size={14} />
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* CTA Panel */}
-        <div ref={bannerRef} className="pt-4 pb-12">
-          <div className="rounded-[2.5rem] overflow-hidden shadow-2xl border border-black/5 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-md">
-            <div className="relative w-full p-8 sm:p-10 lg:p-16 flex flex-col items-center justify-center text-center">
-              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-2 border-black/5 dark:border-white/5 opacity-5 pointer-events-none" />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full border border-black/5 dark:border-white/5 opacity-5 pointer-events-none" />
-
-              <div className="relative z-10 max-w-2xl">
-                <span
-                  className="inline-block px-4 py-1.5 text-xs font-bold uppercase rounded-full text-white mb-5 animate-pulse"
-                  style={{ background: GRADIENT }}
-                >
-                  Scale Today
-                </span>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground leading-tight mb-4 tracking-tight">
-                  Let&apos;s engineer your brand&apos;s <span style={gradientText}>viral roadmap</span>
-                </h2>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-8 font-medium">
-                  We couple hook structures with retention design to drive meaningful, organic metrics. Let&apos;s map out your channel today.
-                </p>
-
-                <a
-                  href="#contact"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-foreground border border-black/15 dark:border-white/20 hover:border-black/30 dark:hover:border-white/40 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 hover:scale-[1.03]"
-                >
-                  Book a Growth Call
-                  <ArrowRight size={16} />
-                </a>
-              </div>
-            </div>
+        {/* Assembly Line Bottom Action Callout */}
+        <div ref={bannerRef} className="mt-20 rounded-3xl border border-border/80 bg-card shadow-[0_20px_50px_rgba(0,0,0,0.02)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.12)] overflow-hidden">
+          <div className="p-8 sm:p-12 flex flex-col items-center justify-center text-center gap-6 relative bg-gradient-to-br from-primary/[0.02] to-secondary/[0.02]">
+            <span className="inline-flex items-center gap-1.5 border border-secondary/15 px-3 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider text-secondary bg-secondary/5">
+              ⚡ STRATEGIC CAMPAIGNS ACTIVE
+            </span>
+            <h3 className="font-heading text-2xl sm:text-3xl font-black uppercase text-foreground leading-none tracking-tight">
+              Ready to elevate your brand&apos;s presence?
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xl font-semibold">
+              We combine strategic PR with high-impact influencer marketing to build authority and reach. Let&apos;s design your next campaign.
+            </p>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 bg-foreground text-background px-8 py-3.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 hover:bg-primary hover:text-white hover:scale-[1.02] shadow-md shadow-foreground/5"
+            >
+              Start Your Campaign
+              <ArrowRight size={12} />
+            </a>
           </div>
         </div>
 
       </div>
     </section>
   );
-};
-
-export default HowWeWork;
+}

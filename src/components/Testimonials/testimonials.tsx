@@ -1,180 +1,275 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
+import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import { Star, MessageSquareQuote } from "lucide-react";
+import { MessageSquareQuote } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const GRADIENT = "linear-gradient(135deg,#FF6B35,#FF1493,#9D00FF)";
-
-const gradientText = {
-  background: GRADIENT,
-  WebkitBackgroundClip: "text" as const,
-  WebkitTextFillColor: "transparent",
-};
 
 const testimonials = [
   {
     quote:
-      "AWA Media scaled our founder's LinkedIn impressions by 4x and drove direct organic inquiries from our carousel strategy. They are master hook engineers.",
-    author: "Sarah Mitchell",
-    role: "CEO, TechVision Inc.",
+      "AWA Media orchestrated our entire property launch PR — from influencer walkthroughs to media coverage across Gujarat. The response exceeded every projection we had.",
+    author: "Rajesh Patel",
+    role: "VP Marketing, CREDAI Ahmedabad",
     rating: 5,
   },
   {
     quote:
-      "We saw a 380% direct ROI on our Reels campaign. They manage everything from script auditing to editing and community management. Highly recommended.",
-    author: "Marcus Chen",
-    role: "Marketing Director, Innovate Labs",
+      "Their influencer campaigns for our product launches drove massive social engagement and footfall. AWA truly understands brand storytelling at scale.",
+    author: "Neha Sharma",
+    role: "Brand Manager, Havmor Ice Cream",
     rating: 5,
   },
   {
     quote:
-      "Their short-form pacing is incredible. We went from 0 to 150k followers in under 90 days on TikTok. Our retention curves have never looked better.",
-    author: "Emily Rodriguez",
-    role: "Founder, Green Future Co.",
+      "From artist announcements to day-of coverage, AWA Media handled our concert PR flawlessly. Ticket sales surged after every influencer post they coordinated.",
+    author: "Arjun Mehta",
+    role: "Event Director, LiveNow Entertainment",
     rating: 5,
   },
 ];
 
-const Testimonials = () => {
-  const [isMobile, setIsMobile] = useState(false);
+const headingText = "VERIFIED FEEDBACK";
+const headingWords = headingText.split(" ");
+
+/** Per-card entry directions for visual variety */
+const cardEntryDirections = [
+  { opacity: 0, x: -30, y: 0 },   // first card from left
+  { opacity: 0, x: 0, y: 40 },    // second card from bottom
+  { opacity: 0, x: 30, y: 0 },    // third card from right
+];
+
+export default function Testimonials() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const animated = useRef(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+  const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const quoteIconRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const starRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   useGSAP(
     () => {
-      if (isMobile) return;
-      if (animated.current) return;
+      // --- Heading: staggered word reveal ---
+      const wordInners = wordRefs.current.filter(Boolean);
+      if (wordInners.length) {
+        gsap.to(wordInners, {
+          y: 0,
+          duration: 0.7,
+          stagger: 0.08,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: titleRef.current,
+            start: "top 85%",
+            once: true,
+          },
+        });
+      }
 
-      const title = titleRef.current;
-      const cards = cardsRef.current?.children;
-      if (!title || !cards) return;
+      // --- Badge & description fade in ---
+      const badge = titleRef.current?.querySelector(".inline-flex");
+      const desc = titleRef.current?.querySelector("p");
+      if (badge) {
+        gsap.fromTo(
+          badge,
+          { opacity: 0, y: 15 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: titleRef.current,
+              start: "top 85%",
+              once: true,
+            },
+          }
+        );
+      }
+      if (desc) {
+        gsap.fromTo(
+          desc,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: 0.35,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: titleRef.current,
+              start: "top 85%",
+              once: true,
+            },
+          }
+        );
+      }
 
-      gsap.set([title, cards], { opacity: 0, y: 20 });
+      // --- Testimonial cards: directionally varied entry ---
+      cardRefs.current.forEach((card, i) => {
+        if (!card) return;
+        const from = cardEntryDirections[i] || { opacity: 0, y: 40, x: 0 };
+        gsap.fromTo(
+          card,
+          from,
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            duration: 0.8,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
+      });
 
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          once: true,
-          onEnter: () => (animated.current = true),
-        },
-      })
-        .to(title, { opacity: 1, y: 0, duration: 0.4 })
-        .to(cards, { opacity: 1, y: 0, stagger: 0.12, duration: 0.35 }, "-=0.2");
+      // --- Quote icons: spin-scale reveal ---
+      const quoteIcons = quoteIconRefs.current.filter(Boolean);
+      if (quoteIcons.length) {
+        gsap.fromTo(
+          quoteIcons,
+          { opacity: 0, scale: 0, rotation: -20 },
+          {
+            opacity: 1,
+            scale: 1,
+            rotation: 0,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: "back.out(1.7)",
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
+      }
+
+      // --- Star ratings: sequential stagger ---
+      const stars = starRefs.current.filter(Boolean);
+      if (stars.length) {
+        gsap.fromTo(
+          stars,
+          { opacity: 0, scale: 0.5, y: 10 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.06,
+            ease: "back.out(2)",
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
+      }
     },
-    { scope: sectionRef, dependencies: [isMobile] }
+    { scope: sectionRef }
   );
 
-  // Mobile Animation
-  useEffect(() => {
-    if (!isMobile) return;
-    if (animated.current) return;
-
-    const title = titleRef.current;
-    const cards = cardsRef.current ? Array.from(cardsRef.current.children) : [];
-
-    if (title) gsap.set(title, { opacity: 0, y: 20 });
-    if (cards.length) gsap.set(cards, { opacity: 0, y: 20 });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            gsap.to(entry.target, {
-              opacity: 1,
-              y: 0,
-              duration: 0.5,
-              ease: "power2.out",
-              overwrite: true
-            });
-            observer.unobserve(entry.target);
-            animated.current = true;
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (title) observer.observe(title);
-    cards.forEach(card => observer.observe(card));
-
-    return () => observer.disconnect();
-  }, [isMobile]);
+  /** Track the running index for individual stars across all cards */
+  let starIndex = 0;
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full overflow-hidden py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-background transition-colors duration-500 border-t border-black/5 dark:border-white/5"
+      className="relative w-full overflow-hidden py-24 lg:py-32 bg-background"
     >
-      <div className="max-w-6xl mx-auto">
+      {/* Background glow decoration */}
+      <div className="absolute bottom-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-primary/4 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Header */}
-        <div ref={titleRef} className="mb-12">
-          <span
-            className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide text-white mb-3"
-            style={{ background: GRADIENT }}
-          >
-            Reviews
-          </span>
-
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-2 tracking-tight">
-            What Creators <span style={gradientText}>& Brands Say</span>
+        <div ref={titleRef} className="text-left mb-16 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/10 bg-primary/5 text-primary text-[10px] font-extrabold uppercase tracking-wider mb-3">
+            <span>CLIENT REVIEWS</span>
+          </div>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-black text-foreground uppercase leading-none tracking-tight mb-4">
+            {headingWords.map((word, i) => (
+              <span key={i} className="word-mask mr-[0.25em] last:mr-0">
+                <span
+                  className="word-inner"
+                  ref={(el) => { wordRefs.current[i] = el; }}
+                >
+                  {word}
+                </span>
+              </span>
+            ))}
           </h2>
-
-          <p className="text-sm sm:text-base text-muted-foreground max-w-xl font-medium">
-            Helping founders and agencies break retention benchmarks.
+          <p className="text-sm text-muted-foreground leading-relaxed font-semibold">
+            Trusted by leading brands, real estate developers, and event organizers across India.
           </p>
         </div>
 
-        {/* Cards */}
+        {/* Spacious Reviews Grid */}
         <div
           ref={cardsRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="flex lg:grid lg:grid-cols-3 gap-6 lg:gap-8 overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory scrollbar-none pb-4 -mx-4 px-4 lg:mx-0 lg:px-0"
         >
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className="relative bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-md rounded-3xl p-6 hover:shadow-lg transition-all duration-300 group"
-            >
-              <div className="opacity-20 mb-4 text-[#FF1493] group-hover:scale-110 transition-transform duration-300">
-                <MessageSquareQuote size={32} />
-              </div>
+          {testimonials.map((t, i) => {
+            // Build individual star spans for stagger animation
+            const starsMarkup = Array.from({ length: t.rating }, (_, s) => {
+              const idx = starIndex++;
+              return (
+                <span
+                  key={s}
+                  ref={(el) => { starRefs.current[idx] = el; }}
+                  className="inline-block"
+                >
+                  ★
+                </span>
+              );
+            });
 
-              <div className="flex gap-1 mb-4 text-amber-500">
-                {[...Array(t.rating)].map((_, idx) => (
-                  <Star key={idx} size={16} fill="currentColor" />
-                ))}
-              </div>
+            return (
+              <div
+                key={i}
+                ref={(el) => { cardRefs.current[i] = el; }}
+                className="p-8 rounded-3xl border border-border bg-card flex flex-col justify-between min-h-[300px] hover:border-primary/20 hover:shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:hover:shadow-[0_15px_40px_rgba(0,0,0,0.15)] hover:bg-background transition-all duration-300 group cursor-pointer snap-center shrink-0 w-[85vw] lg:w-auto"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-secondary tracking-widest font-extrabold">
+                      {starsMarkup}
+                    </span>
+                    <div
+                      ref={(el) => { quoteIconRefs.current[i] = el; }}
+                      className="inline-flex"
+                    >
+                      <MessageSquareQuote size={16} className="text-muted-foreground opacity-30 group-hover:text-primary group-hover:opacity-100 transition-all duration-300" />
+                    </div>
+                  </div>
 
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6 font-semibold">
-                &ldquo;{t.quote}&rdquo;
-              </p>
+                  <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed font-semibold">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                </div>
 
-              <div className="border-t border-black/5 dark:border-white/10 pt-4">
-                <p className="text-sm font-black text-foreground uppercase tracking-wide">
-                  {t.author}
-                </p>
-                <p className="text-xs text-muted-foreground font-semibold">{t.role}</p>
+                <div className="border-t border-border/60 pt-4 mt-8">
+                  <h4 className="font-heading text-xs font-black text-foreground uppercase tracking-wide">
+                    {t.author}
+                  </h4>
+                  <span className="font-mono text-[9px] text-muted-foreground uppercase">
+                    {t.role}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
-};
-
-export default Testimonials;
+}

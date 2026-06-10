@@ -16,7 +16,7 @@
 
   overflow: hidden;
   z-index: 99999998;
-  background: #ffffff;
+  background: #FAF9F6; /* Match default Paper Off-White theme */
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -72,6 +72,39 @@
     height: 14px;
     margin-left: -7px;
     margin-top: -7px;
+  }
+}
+
+.convergenceGlow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(17, 17, 17, 0.12) 0%,     /* Carbon */
+    rgba(107, 114, 128, 0.08) 30%,  /* Silver */
+    rgba(156, 163, 175, 0.04) 50%,  /* Gray */
+    transparent 70%
+  );
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+
+  @media (min-width: 768px) {
+    width: 450px;
+    height: 450px;
+    filter: blur(60px);
+  }
+
+  @media (min-width: 1024px) {
+    width: 600px;
+    height: 600px;
+    filter: blur(80px);
   }
 }
 
@@ -160,5 +193,5 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: #ffffff; // Ensure background fills completely
+  background: #FAF9F6; // Match Paper Off-White background
 }
